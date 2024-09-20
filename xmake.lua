@@ -1,3 +1,10 @@
-target("hello")
+add_toolchains("mingw")
+target("algmath")
+    set_kind("shared")
+    add_files("c_lib/matrix/alg_matrix.c")
+    add_files("c_lib/vector/alg_vector.c")
+    
+target("pso")
     set_kind("binary")
-    add_files("c_lib/matrix/*.c")
+    add_files("pso/c/*.c")
+    add_deps("algmath")

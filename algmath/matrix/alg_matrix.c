@@ -1,13 +1,6 @@
 #include "alg_matrix.h"
-#include <string.h> // 使用标准库的string.h而不是cstring
+#include <time.h>
 
-/**
- * @brief 创建一个矩阵对象
- *
- * @param row
- * @param col
- * @return alg_matrix*
- */
 alg_matrix *alg_matrix_create(int row, int col) {
     alg_matrix *mat = (alg_matrix *)malloc(sizeof(alg_matrix));
     if (mat == NULL)
@@ -23,15 +16,6 @@ alg_matrix *alg_matrix_create(int row, int col) {
     return mat;
 }
 
-/**
- * @brief 为矩阵对象赋值
- *
- * @param matrix
- * @param row
- * @param col
- * @param val
- * @return alg_state
- */
 alg_state alg_matrix_set_val(alg_matrix *matrix, int row, int col, alg_val_type val) {
 #if USE_ASSERT
     assert(matrix != NULL);
@@ -45,10 +29,6 @@ alg_state alg_matrix_set_val(alg_matrix *matrix, int row, int col, alg_val_type 
     return ALG_OK;
 }
 
-/**
- * @brief 获取矩阵对于位置的指针
- * @arg matrix row col
- */
 alg_val_type *alg_matrix_get_pos_val(const alg_matrix *matrix, int row, int col) {
 #if USE_ASSERT
     assert(matrix != NULL);
@@ -80,9 +60,7 @@ alg_matrix *alg_matrix_copy(const alg_matrix *matrix) {
     memcpy(ret->mat, matrix->mat, sizeof(alg_val_type) * matrix->col * matrix->row);
     return ret;
 }
-/**
- * @brief 矩阵加法
- */
+
 alg_matrix *alg_matrix_add(const alg_matrix *mat1, const alg_matrix *mat2) {
 #if USE_ASSERT
     assert(mat1 != NULL && mat2 != NULL);
@@ -102,9 +80,25 @@ alg_matrix *alg_matrix_add(const alg_matrix *mat1, const alg_matrix *mat2) {
     return ret;
 }
 
-/**
- * @brief 矩阵点积
- */
+alg_matrix *alg_matrix_subtraction(const alg_matrix *mat1, const alg_matrix *mat2) {
+#if USE_ASSERT
+    assert(mat1 != NULL && mat2 != NULL);
+    assert(mat1->col == mat2->col && mat1->row == mat2->row);
+#else
+    if (mat1 == NULL || mat2 == NULL)
+        return NULL;
+    if (mat1->col != mat2->col || mat1->row != mat2->row)
+        return NULL; // 检查行和列是否相等
+#endif
+    alg_matrix *ret = alg_matrix_create(mat1->row, mat1->col);
+    if (ret == NULL)
+        return NULL;
+
+    for (int i = 0; i < mat1->col * mat1->row; i++)
+        ret->mat[i] = mat1->mat[i] - mat2->mat[i];
+    return ret;
+}
+
 alg_matrix *alg_matrix_dot(const alg_matrix *mat1, const alg_matrix *mat2) {
 #if USE_ASSERT
     assert(mat1 != NULL && mat2 != NULL);
@@ -124,9 +118,22 @@ alg_matrix *alg_matrix_dot(const alg_matrix *mat1, const alg_matrix *mat2) {
     return ret;
 }
 
-/**
- * @brief 矩阵乘法
- */
+alg_matrix *alg_matrix_dot_number(const alg_matrix *mat1, const double number) {
+#if USE_ASSERT
+    assert(mat1 != NULL);
+#else
+    if (mat1 == NULL)
+        return NULL;
+#endif
+    alg_matrix *ret = alg_matrix_create(mat1->row, mat1->col);
+    if (ret == NULL)
+        return NULL;
+
+    for (int i = 0; i < mat1->col * mat1->row; i++)
+        ret->mat[i] = mat1->mat[i] * number;
+    return ret;
+}
+
 alg_matrix *alg_matrix_times(const alg_matrix *mat1, const alg_matrix *mat2) {
 #if USE_ASSERT
     assert(mat1 != NULL && mat2 != NULL);
@@ -145,17 +152,13 @@ alg_matrix *alg_matrix_times(const alg_matrix *mat1, const alg_matrix *mat2) {
         for (int j = 0; j < mat2->col; j++) {
             alg_val_type *val = alg_matrix_get_pos_val(ret, i, j);
             for (int k = 0; k < mat1->col; k++) {
-                *val +=
-                    (*alg_matrix_get_pos_val(mat1, i, k)) * (*alg_matrix_get_pos_val(mat2, k, j));
+                *val += (*alg_matrix_get_pos_val(mat1, i, k)) * (*alg_matrix_get_pos_val(mat2, k, j));
             }
         }
     }
     return ret;
 }
 
-/**
- * @brief 就地矩阵加法
- */
 alg_state alg_matrix_add_inplace(alg_matrix *mat1, const alg_matrix *mat2) {
 #if USE_ASSERT
     assert(mat1 != NULL && mat2 != NULL);
@@ -171,9 +174,6 @@ alg_state alg_matrix_add_inplace(alg_matrix *mat1, const alg_matrix *mat2) {
     return ALG_OK;
 }
 
-/**
- * @brief 就地矩阵点积
- */
 alg_state alg_matrix_dot_inplace(alg_matrix *mat1, const alg_matrix *mat2) {
 #if USE_ASSERT
     assert(mat1 != NULL && mat2 != NULL);
@@ -189,9 +189,18 @@ alg_state alg_matrix_dot_inplace(alg_matrix *mat1, const alg_matrix *mat2) {
     return ALG_OK;
 }
 
-/**
- * @brief 从向量创建矩阵
- */
+alg_state alg_matrix_dot_number_inplace(alg_matrix *mat1, const double number) {
+#if USE_ASSERT
+    assert(mat1 != NULL);
+#else
+    if (mat1 == NULL)
+        return ALG_ERROR;
+#endif
+    for (int i = 0; i < mat1->col * mat1->row; i++)
+        mat1->mat[i] *= number;
+    return ALG_OK;
+}
+
 alg_matrix *alg_matrix_from_vector(const alg_vector *vec) {
     alg_matrix *matrix = alg_matrix_create(vec->size, 1);
     if (matrix == NULL) {
@@ -201,9 +210,6 @@ alg_matrix *alg_matrix_from_vector(const alg_vector *vec) {
     return matrix;
 }
 
-/**
- * @brief 打印矩阵
- */
 char *alg_matrix_print_str(alg_matrix *matrix) {
     if (matrix == NULL || matrix->mat == NULL) {
         return NULL;
@@ -238,12 +244,9 @@ char *alg_matrix_print_str(alg_matrix *matrix) {
     return str;
 }
 
-/**
- * @brief 释放矩阵内存
- */
 alg_state alg_matrix_free(alg_matrix *matrix) {
     if (matrix == NULL)
-        return ALG_ERROR; 
+        return ALG_ERROR;
 
     if (matrix->mat != NULL) {
         free(matrix->mat);
@@ -265,4 +268,55 @@ alg_state alg_matrix_transpose_inplace(alg_matrix *mat) {
     mat->col = mat->row;
     mat->row = tmp;
     return ALG_OK;
+}
+
+alg_state alg_matrix_set_row(alg_matrix *matrix, int row, const alg_vector *vec) {
+    // 检查传入的矩阵和向量是否为NULL
+    if (matrix == NULL || vec == NULL)
+        return ALG_ERROR;
+
+    // 确保行号合法
+    if (row < 0 || row >= matrix->row)
+        return ALG_ERROR;
+
+    // 确保向量大小与矩阵列数一致
+    if (vec->size != matrix->col)
+        return ALG_ERROR;
+
+    // 将向量的值复制到矩阵的指定行
+    for (int i = 0; i < matrix->col; i++) {
+        matrix->mat[row * matrix->col + i] = vec->vector[i]; // 假设矩阵是行主序存储的
+    }
+
+    return ALG_OK;
+};
+
+void alg_matrix_fill_random(alg_matrix *matrix, double min_val, double max_val) {
+    // 如果矩阵为空，直接返回
+    if (matrix == NULL || matrix->mat == NULL)
+        return;
+
+    int total_elements = matrix->row * matrix->col;
+
+    // 生成 [min_val, max_val] 范围内的随机值并赋值给矩阵
+    for (int i = 0; i < total_elements; i++) {
+        double rand_val = min_val + (double)rand() / RAND_MAX * (max_val - min_val);
+        matrix->mat[i] = rand_val;
+    }
+}
+
+void alg_matrix_clamp(alg_matrix *matrix, double min_val, double max_val) {
+    // 如果矩阵为空，直接返回
+    if (matrix == NULL || matrix->mat == NULL)
+        return;
+
+    int total_elements = matrix->row * matrix->col;
+
+    // 遍历矩阵的每个元素并进行幅值限定
+    for (int i = 0; i < total_elements; i++) {
+        if (matrix->mat[i] < min_val)
+            matrix->mat[i] = min_val;
+        else if (matrix->mat[i] > max_val)
+            matrix->mat[i] = max_val;
+    }
 }
