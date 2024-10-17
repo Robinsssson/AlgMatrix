@@ -1,9 +1,10 @@
 add_toolchains("mingw")
+add_requires("gsl")
 target("algmath")
     set_kind("shared")
-    add_files("c_lib/matrix/alg_matrix.c")
-    add_files("c_lib/vector/alg_vector.c")
-    
+    add_files("algmath/matrix/alg_matrix.c")
+    add_files("algmath/vector/alg_vector.c")
+
 target("pso")
     set_kind("binary")
     add_files("pso/c/*.c")

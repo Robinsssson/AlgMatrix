@@ -1,5 +1,6 @@
 #include "pso.h"
 #include <math.h>
+#include <time.h>
 #include <stdio.h>
 
 // 定义PSO算法的目标函数
@@ -46,6 +47,7 @@ void test_pso() {
 }
 
 int main() {
+    srand(time(NULL));
     test_pso();
     return 0;
 }
