@@ -1,5 +1,5 @@
 #include "ga.h"
-#include <cmath>
+#include <math.h>
 
 ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga_aim_function function, int args_number, double var_max, double var_min) {
     ga_handle *ga = malloc(sizeof(ga_handle));
