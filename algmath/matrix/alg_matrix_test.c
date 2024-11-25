@@ -18,14 +18,14 @@ int main() {
             alg_matrix_set_val(mat2, i, j, ++k);
         }
     }
-    free(strs);
+    ALG_FREE(strs);
     strs = alg_matrix_print_str(mat1);
     printf("%s\n", strs);
-    free(strs);
+    ALG_FREE(strs);
     alg_matrix *ret = alg_matrix_times(mat1, mat2);
     strs = alg_matrix_print_str(ret);
     printf("%s\n", strs);
-    free(strs);
+    ALG_FREE(strs);
     alg_matrix_free(mat1);
     alg_matrix_free(mat2);
     alg_matrix_free(ret);

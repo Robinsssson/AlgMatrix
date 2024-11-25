@@ -10,7 +10,7 @@
  * @param init_val 向量元素的初始值
  * @return alg_vector* 指向创建的向量对象的指针，失败时返回 NULL
  */
-alg_vector *alg_vector_create(int size, alg_val_type init_val);
+ALG_MATH_API alg_vector *alg_vector_create(int size, alg_val_type init_val);
 
 /**
  * @brief 获取向量指定位置的值
@@ -19,7 +19,7 @@ alg_vector *alg_vector_create(int size, alg_val_type init_val);
  * @param pos 要获取的值的位置
  * @return alg_val_type* 指向指定位置值的指针，失败时返回 NULL
  */
-alg_val_type *alg_vector_get_val(alg_vector *vec, int pos);
+ALG_MATH_API alg_val_type *alg_vector_get_val(alg_vector *vec, int pos);
 
 /**
  * @brief 设置向量指定位置的值
@@ -29,7 +29,7 @@ alg_val_type *alg_vector_get_val(alg_vector *vec, int pos);
  * @param val 要设置的值
  * @return alg_state 返回操作状态，成功时为 ALG_OK，失败时为 ALG_ERROR
  */
-alg_state alg_vector_set_val(alg_vector *vec, int pos, alg_val_type val);
+ALG_MATH_API alg_state alg_vector_set_val(alg_vector *vec, int pos, alg_val_type val);
 
 /**
  * @brief 在向量的指定位置插入一个值
@@ -39,7 +39,7 @@ alg_state alg_vector_set_val(alg_vector *vec, int pos, alg_val_type val);
  * @param val 要插入的值
  * @return alg_state 返回操作状态，成功时为 ALG_OK，失败时为 ALG_ERROR
  */
-alg_state alg_vector_insert(alg_vector *vec, int pos, alg_val_type val);
+ALG_MATH_API alg_state alg_vector_insert(alg_vector *vec, int pos, alg_val_type val);
 
 /**
  * @brief 释放向量占用的内存
@@ -47,7 +47,7 @@ alg_state alg_vector_insert(alg_vector *vec, int pos, alg_val_type val);
  * @param vec 指向要释放的向量对象的指针
  * @return alg_state 返回操作状态，成功时为 ALG_OK，失败时为 ALG_ERROR
  */
-alg_state alg_vector_free(alg_vector *vec);
+ALG_MATH_API alg_state alg_vector_free(alg_vector *vec);
 
 /**
  * @brief 从矩阵的指定行创建向量
@@ -56,7 +56,7 @@ alg_state alg_vector_free(alg_vector *vec);
  * @param row 要提取的行索引
  * @return alg_vector* 指向创建的向量对象的指针，失败时返回 NULL
  */
-alg_vector *alg_vector_from_matrix_row(const alg_matrix *matrix, int row);
+ALG_MATH_API alg_vector *alg_vector_from_matrix_row(const alg_matrix *matrix, int row);
 
 /**
  * @brief 从矩阵的指定列创建向量
@@ -65,6 +65,14 @@ alg_vector *alg_vector_from_matrix_row(const alg_matrix *matrix, int row);
  * @param col 要提取的列索引
  * @return alg_vector* 指向创建的向量对象的指针，失败时返回 NULL
  */
-alg_vector *alg_vector_from_matrix_col(const alg_matrix *matrix, int col);
+ALG_MATH_API alg_vector *alg_vector_from_matrix_col(const alg_matrix *matrix, int col);
+
+/**
+ * @brief 打印向量的结果
+ *
+ * @param vector 指向向量对象的指针
+ * @return char* 指向创建的向量对象的指针，失败时返回 NULL
+ */
+ALG_MATH_API char *alg_vector_print_str(const alg_vector *vector);
 
 #endif

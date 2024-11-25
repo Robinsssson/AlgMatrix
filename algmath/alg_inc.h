@@ -1,11 +1,25 @@
 #ifndef __ALG_INC_H__
 #define __ALG_INC_H__
 #include <assert.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
+#ifdef _WIN32     // Windows平台
+#ifdef ALG_EXPORT // 定义在编译动态库时设置的宏
+#define ALG_MATH_API __declspec(dllexport)
+#else
+#define ALG_MATH_API __declspec(dllimport)
+#endif
+#else // 非Windows平台
+#define ALG_MATH_API
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#define ALG_MALLOC malloc
+#define ALG_FREE free
+#define ALG_REALLOC realloc
+#define ALG_CALLOC calloc
 // 定义基础类型
 typedef double alg_val_type;
 #define GLOBAL_INIT_VAL 0.0
@@ -42,9 +56,14 @@ typedef struct __alg_matrix alg_matrix;
 #define ALG_LOG_MSG_FREE_NULL "Attempted to free a NULL vector."
 
 #if USE_LOG
-#define LOGGING(str) printf("%s, in file %s, line %d\n", str, __FILE__, __LINE__);
+#define LOGGING(str)                                                                               \
+    printf("%s, in file %s, function %s, line %d\n", str, __FILE__, __FUNCTION__, __LINE__);
 #else
 #define LOGGING(str)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

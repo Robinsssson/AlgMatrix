@@ -20,7 +20,8 @@ typedef struct {
     pso_type type;
 } pso_handle;
 
-pso_handle *pso_init(int number, int dim, double w, double c1, double c2, pso_aim_function function, pso_type type);
+pso_handle *pso_init(int number, int dim, double w, double c1, double c2, pso_aim_function function,
+                     pso_type type);
 void pso_fresh(pso_handle *pso_structure, double min_vec, double max_vec);
 pso_handle *pso_free(pso_handle *pso_structure);
 

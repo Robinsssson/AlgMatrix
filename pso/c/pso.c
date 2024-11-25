@@ -4,31 +4,34 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Helper function to free PSO resources
+// Helper function to ALG_FREE PSO resources
 static void pso_free_internal(pso_handle *pso_structure) {
     alg_matrix_free(pso_structure->g_best);
     alg_matrix_free(pso_structure->p_best);
     alg_matrix_free(pso_structure->position);
     alg_matrix_free(pso_structure->vec);
-    free(pso_structure->p_best_fitness);
+    ALG_FREE(pso_structure->p_best_fitness);
 }
 
-pso_handle *pso_init(int number, int dim, double w, double c1, double c2, pso_aim_function function, pso_type type) {
-    pso_handle *pso_structure = malloc(sizeof(pso_handle));
+pso_handle *pso_init(int number, int dim, double w, double c1, double c2, pso_aim_function function,
+                     pso_type type) {
+    pso_handle *pso_structure = ALG_MALLOC(sizeof(pso_handle));
     if (!pso_structure)
         return NULL;
 
     pso_structure->vec = alg_matrix_create(number, dim);
     pso_structure->position = alg_matrix_create(number, dim);
     pso_structure->p_best = alg_matrix_copy(pso_structure->position);
-    pso_structure->g_best = alg_matrix_create(number, dim); // Global best is usually a single particle
+    pso_structure->g_best =
+        alg_matrix_create(number, dim); // Global best is usually a single particle
 
-    if (!pso_structure->vec || !pso_structure->position || !pso_structure->p_best || !pso_structure->g_best) {
+    if (!pso_structure->vec || !pso_structure->position || !pso_structure->p_best
+        || !pso_structure->g_best) {
         pso_free_internal(pso_structure);
         return NULL;
     }
 
-    pso_structure->p_best_fitness = malloc(number * sizeof(double));
+    pso_structure->p_best_fitness = ALG_MALLOC(number * sizeof(double));
     if (!pso_structure->p_best_fitness) {
         pso_free_internal(pso_structure);
         return NULL;
@@ -65,7 +68,8 @@ void pso_fresh(pso_handle *pso_structure, double min_vec, double max_vec) {
         double fitness = pso_calculate_fitness(pso_structure, i);
 
         // 更新个人最佳位置和适应度
-        if ((pso_structure->type == PSO_USE_MAX && fitness > pso_structure->p_best_fitness[i]) || (pso_structure->type == PSO_USE_MIN && fitness < pso_structure->p_best_fitness[i])) {
+        if ((pso_structure->type == PSO_USE_MAX && fitness > pso_structure->p_best_fitness[i])
+            || (pso_structure->type == PSO_USE_MIN && fitness < pso_structure->p_best_fitness[i])) {
             // 更新个人最佳适应度
             pso_structure->p_best_fitness[i] = fitness;
             // 更新个人最佳位置
@@ -75,7 +79,8 @@ void pso_fresh(pso_handle *pso_structure, double min_vec, double max_vec) {
         }
 
         // 更新全局最佳
-        if ((pso_structure->type == PSO_USE_MAX && fitness > best_val) || (pso_structure->type == PSO_USE_MIN && fitness < best_val)) {
+        if ((pso_structure->type == PSO_USE_MAX && fitness > best_val)
+            || (pso_structure->type == PSO_USE_MIN && fitness < best_val)) {
             best_val = fitness;
             best_idx = i;
         }
@@ -97,8 +102,8 @@ void pso_fresh(pso_handle *pso_structure, double min_vec, double max_vec) {
     alg_matrix *sub1 = alg_matrix_subtraction(pso_structure->p_best, pso_structure->position);
     alg_matrix *sub2 = alg_matrix_subtraction(pso_structure->g_best, pso_structure->position);
 
-    pso_structure->r1 = (double)rand() / RAND_MAX;
-    pso_structure->r2 = (double)rand() / RAND_MAX;
+    pso_structure->r1 = alg_random_float64(0, 1);
+    pso_structure->r2 = alg_random_float64(0, 1);
 
     alg_matrix_dot_number_inplace(sub1, pso_structure->r1 * pso_structure->c1);
     alg_matrix_dot_number_inplace(sub2, pso_structure->r2 * pso_structure->c2);
@@ -115,7 +120,7 @@ void pso_fresh(pso_handle *pso_structure, double min_vec, double max_vec) {
 pso_handle *pso_free(pso_handle *pso_structure) {
     if (pso_structure) {
         pso_free_internal(pso_structure);
-        free(pso_structure);
+        ALG_FREE(pso_structure);
     }
     return NULL;
 }

@@ -1,16 +1,19 @@
 #include "alg_matrix.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <time.h>
 
 alg_matrix *alg_matrix_create(int row, int col) {
-    alg_matrix *mat = (alg_matrix *)malloc(sizeof(alg_matrix));
+    alg_matrix *mat = (alg_matrix *)ALG_MALLOC(sizeof(alg_matrix));
     if (mat == NULL)
         return NULL;
 
     mat->col = col;
     mat->row = row;
-    mat->mat = (alg_val_type *)calloc(row * col, sizeof(alg_val_type)); // 分配正确大小的内存
+    mat->mat = (alg_val_type *)ALG_CALLOC(row * col, sizeof(alg_val_type)); // 分配正确大小的内存
     if (mat->mat == NULL) {
-        free(mat);
+        ALG_FREE(mat);
         return NULL;
     }
     return mat;
@@ -217,7 +220,7 @@ char *alg_matrix_print_str(alg_matrix *matrix) {
 
     // 估算初始缓冲区大小。每个数字最多保留 2 位小数，含符号、逗号、空格等。
     int buf_size = matrix->row * matrix->col * 25 + matrix->row * 4 + 4; // 初始估算
-    char *str = (char *)malloc(buf_size);
+    char *str = (char *)ALG_MALLOC(buf_size);
     if (str == NULL) {
         return NULL;
     }
@@ -240,7 +243,7 @@ char *alg_matrix_print_str(alg_matrix *matrix) {
         }
     }
     pos += snprintf(str + pos, buf_size - pos, "\n]"); // 矩阵结束方括号
-
+    
     return str;
 }
 
@@ -249,9 +252,9 @@ alg_state alg_matrix_free(alg_matrix *matrix) {
         return ALG_ERROR;
 
     if (matrix->mat != NULL) {
-        free(matrix->mat);
+        ALG_FREE(matrix->mat);
     }
-    free(matrix);
+    ALG_FREE(matrix);
     return ALG_OK;
 }
 

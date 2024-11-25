@@ -11,7 +11,8 @@ typedef struct {
     ga_aim_function function;
 } ga_handle;
 
-ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga_aim_function function, int args_number, double var_max, double var_min);
+ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate,
+                   ga_aim_function function, int args_number, double var_max, double var_min);
 void ga_fresh(ga_handle *ga);
 void ga_free(ga_handle *ga);
 

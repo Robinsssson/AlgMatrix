@@ -1,8 +1,10 @@
 #include "ga.h"
 #include <math.h>
+#include <stdlib.h>
 
-ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga_aim_function function, int args_number, double var_max, double var_min) {
-    ga_handle *ga = malloc(sizeof(ga_handle));
+ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate,
+                   ga_aim_function function, int args_number, double var_max, double var_min) {
+    ga_handle *ga = ALG_MALLOC(sizeof(ga_handle));
     if (ga == NULL)
         return NULL;
     ga->crossover_rate = crossover_rate;
@@ -13,7 +15,7 @@ ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga
     ga->var_max = var_max;
     alg_matrix *population = alg_matrix_create(pop_size, args_number);
     if (population == NULL) {
-        free(ga);
+        ALG_FREE(ga);
         return NULL;
     }
     ga->population = population;
@@ -25,8 +27,8 @@ ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga
     }
     alg_vector *fitness = alg_vector_create(ga->pop_size, 0.0);
     if (fitness == NULL) {
-        free(ga);
-        free(population);
+        ALG_FREE(ga);
+        ALG_FREE(population);
         return NULL;
     }
     ga->fitness = fitness;
@@ -37,12 +39,11 @@ static void calculate_fitness(ga_handle *ga) {
     for (int i = 0; i < ga->pop_size; i++) {
         alg_vector *vec = alg_vector_from_matrix_col(ga->population, i);
         alg_vector_set_val(ga->fitness, i, ga->function(vec));
-        free(vec);
+        ALG_FREE(vec);
     }
 }
 
-static int select_best(ga_handle *ga) {
-    calculate_fitness(ga);
+static int select(ga_handle *ga) {
     double min = INFINITY, tmp;
     int index = 0;
     for (int i = 0; i < ga->pop_size; i++) {
@@ -68,5 +69,8 @@ static void mutate(alg_vector *vec, double min, double max, double mutation_rate
     }
 }
 
-void ga_fresh(ga_handle *ga);
+void ga_fresh(ga_handle *ga) {
+    select(ga);
+    calculate_fitness(ga);
+}
 void ga_free(ga_handle *ga);
