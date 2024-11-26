@@ -16,13 +16,9 @@
 extern "C" {
 #endif
 
-#define ALG_MALLOC malloc
-#define ALG_FREE free
-#define ALG_REALLOC realloc
-#define ALG_CALLOC calloc
 // 定义基础类型
 typedef double alg_val_type;
-#define GLOBAL_INIT_VAL 0.0
+#define ALG_INIT_VAL 0.0
 typedef enum {
     ALG_OK,
     ALG_ERROR,
@@ -35,14 +31,14 @@ typedef enum {
 struct __alg_matrix {
     int row;
     int col;
-    alg_val_type *mat; // 一维数组存储矩阵数据
+    alg_val_type mat[]; // 一维数组存储矩阵数据
 };
 
 struct __alg_vector {
     int size;
     int caps;
-    alg_val_type *vector;
-};
+    alg_val_type vector[];
+};                          //动态数组
 
 typedef struct __alg_vector alg_vector;
 typedef struct __alg_matrix alg_matrix;
@@ -61,6 +57,13 @@ typedef struct __alg_matrix alg_matrix;
 #else
 #define LOGGING(str)
 #endif
+typedef struct {
+    void *(*alg_memalloc_malloc)(unsigned long long);
+    void (*alg_memalloc_free)(void *);
+    void *(*alg_memalloc_realloc)(void *, unsigned long long);
+    void *(*alg_memalloc_calloc)(unsigned long long, unsigned long long);
+} alg_memalloc_hook;
+
 
 #ifdef __cplusplus
 }

@@ -1,21 +1,24 @@
 #include "alg_matrix.h"
+#include "../alg_inc.h"
+#include "../memalloc/alg_memalloc.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
 alg_matrix *alg_matrix_create(int row, int col) {
-    alg_matrix *mat = (alg_matrix *)ALG_MALLOC(sizeof(alg_matrix));
+    alg_matrix *mat =
+        (alg_matrix *)ALG_MALLOC(sizeof(alg_matrix) + sizeof(alg_val_type) * row * col);
     if (mat == NULL)
         return NULL;
 
     mat->col = col;
     mat->row = row;
-    mat->mat = (alg_val_type *)ALG_CALLOC(row * col, sizeof(alg_val_type)); // 分配正确大小的内存
-    if (mat->mat == NULL) {
-        ALG_FREE(mat);
-        return NULL;
-    }
+    // mat->mat = (alg_val_type *)ALG_CALLOC(row * col, sizeof(alg_val_type)); // 分配正确大小的内存
+    // if (mat->mat == NULL) {
+    //     ALG_FREE(mat);
+    //     return NULL;
+    // }
     return mat;
 }
 
@@ -32,7 +35,7 @@ alg_state alg_matrix_set_val(alg_matrix *matrix, int row, int col, alg_val_type 
     return ALG_OK;
 }
 
-alg_val_type *alg_matrix_get_pos_val(const alg_matrix *matrix, int row, int col) {
+alg_val_type *alg_matrix_get_pos_val(alg_matrix *matrix, int row, int col) {
 #if USE_ASSERT
     assert(matrix != NULL);
 #else
@@ -44,7 +47,7 @@ alg_val_type *alg_matrix_get_pos_val(const alg_matrix *matrix, int row, int col)
     return &matrix->mat[row * matrix->col + col];
 }
 
-alg_val_type *alg_matrix_get_index_val(const alg_matrix *matrix, int index) {
+alg_val_type *alg_matrix_get_index_val(alg_matrix *matrix, int index) {
 #if USE_ASSERT
     assert(matrix != NULL);
 #else
@@ -137,7 +140,7 @@ alg_matrix *alg_matrix_dot_number(const alg_matrix *mat1, const double number) {
     return ret;
 }
 
-alg_matrix *alg_matrix_times(const alg_matrix *mat1, const alg_matrix *mat2) {
+alg_matrix *alg_matrix_times(alg_matrix *mat1, alg_matrix *mat2) {
 #if USE_ASSERT
     assert(mat1 != NULL && mat2 != NULL);
     assert(mat1->col == mat2->row);
@@ -155,7 +158,8 @@ alg_matrix *alg_matrix_times(const alg_matrix *mat1, const alg_matrix *mat2) {
         for (int j = 0; j < mat2->col; j++) {
             alg_val_type *val = alg_matrix_get_pos_val(ret, i, j);
             for (int k = 0; k < mat1->col; k++) {
-                *val += (*alg_matrix_get_pos_val(mat1, i, k)) * (*alg_matrix_get_pos_val(mat2, k, j));
+                *val +=
+                    (*alg_matrix_get_pos_val(mat1, i, k)) * (*alg_matrix_get_pos_val(mat2, k, j));
             }
         }
     }
@@ -214,7 +218,7 @@ alg_matrix *alg_matrix_from_vector(const alg_vector *vec) {
 }
 
 char *alg_matrix_print_str(alg_matrix *matrix) {
-    if (matrix == NULL || matrix->mat == NULL) {
+    if (matrix == NULL) {
         return NULL;
     }
 
@@ -242,27 +246,30 @@ char *alg_matrix_print_str(alg_matrix *matrix) {
             pos += snprintf(str + pos, buf_size - pos, ",\n"); // 行之间的逗号换行
         }
     }
-    pos += snprintf(str + pos, buf_size - pos, "\n]"); // 矩阵结束方括号
-    
+    pos += snprintf(str + pos, buf_size - pos, "\n]\n"); // 矩阵结束方括号
+
     return str;
 }
 
 alg_state alg_matrix_free(alg_matrix *matrix) {
     if (matrix == NULL)
         return ALG_ERROR;
-
-    if (matrix->mat != NULL) {
-        ALG_FREE(matrix->mat);
-    }
     ALG_FREE(matrix);
     return ALG_OK;
 }
 
-alg_matrix *alg_matrix_transpose(const alg_matrix *mat) {
+alg_matrix *alg_matrix_transpose(alg_matrix *mat) {
     alg_matrix *ret = alg_matrix_copy(mat);
     int tmp = ret->col;
     ret->col = ret->row;
     ret->row = tmp;
+    // 将原矩阵的数据赋值到转置后的矩阵
+    for (int i = 0; i < mat->row; i++) {
+        for (int j = 0; j < mat->col; j++) {
+            // 将原矩阵 mat[i][j] 的值赋给转置矩阵 ret[j][i]
+            alg_matrix_set_val(ret, j, i, *alg_matrix_get_pos_val(mat, i, j));
+        }
+    }
     return ret;
 }
 
@@ -296,7 +303,7 @@ alg_state alg_matrix_set_row(alg_matrix *matrix, int row, const alg_vector *vec)
 
 void alg_matrix_fill_random(alg_matrix *matrix, double min_val, double max_val) {
     // 如果矩阵为空，直接返回
-    if (matrix == NULL || matrix->mat == NULL)
+    if (matrix == NULL)
         return;
 
     int total_elements = matrix->row * matrix->col;
@@ -310,7 +317,7 @@ void alg_matrix_fill_random(alg_matrix *matrix, double min_val, double max_val) 
 
 void alg_matrix_clamp(alg_matrix *matrix, double min_val, double max_val) {
     // 如果矩阵为空，直接返回
-    if (matrix == NULL || matrix->mat == NULL)
+    if (matrix == NULL)
         return;
 
     int total_elements = matrix->row * matrix->col;

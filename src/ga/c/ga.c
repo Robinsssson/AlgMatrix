@@ -7,24 +7,20 @@ ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate,
     ga_handle *ga = ALG_MALLOC(sizeof(ga_handle));
     if (ga == NULL)
         return NULL;
-    ga->crossover_rate = crossover_rate;
-    ga->mutation_rate = mutation_rate;
-    ga->pop_size = pop_size;
-    ga->function = function;
-    ga->var_min = var_min;
-    ga->var_max = var_max;
+    ga->crossover_rate = crossover_rate;    // 交叉率
+    ga->mutation_rate = mutation_rate;      // 变异率
+    ga->pop_size = pop_size;                // 种群大小
+    ga->function = function;                // fitness函数
+    ga->var_min = var_min;                  // lb每个变量的下界
+    ga->var_max = var_max;                  // ub每个变量的上界
     alg_matrix *population = alg_matrix_create(pop_size, args_number);
     if (population == NULL) {
         ALG_FREE(ga);
         return NULL;
     }
-    ga->population = population;
-    for (int i = 0; i < pop_size; i++) {
-        for (int j = 0; j < args_number; j++) {
-            double value = alg_random_float64(var_min, var_max);
-            alg_matrix_set_val(population, i, j, value);
-        }
-    }
+    ga->population = population;            // 种群
+    alg_matrix_fill_random(ga->population, var_min, var_max);
+
     alg_vector *fitness = alg_vector_create(ga->pop_size, 0.0);
     if (fitness == NULL) {
         ALG_FREE(ga);
@@ -58,6 +54,8 @@ static int select(ga_handle *ga) {
 
 static alg_vector *crossover(ga_handle *ga, alg_vector *parent1, alg_vector *parent2) {
     alg_vector *child = alg_vector_create(ga->args_number, 0.0);
+    int number_parent = round(ga->pop_size * ga->crossover_rate);
+    
     return child;
 }
 

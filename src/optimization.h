@@ -12,7 +12,7 @@
  * 分布估计算法 - Estimation of Distribution Algorithm (EDA)
  * 差分进化算法 - Differential Evolution (DE)
  *********************************************************/
-#include "../algmath/alg_inc.h"
+#include "algmath.h"
 
 enum optimization_method {
     GA,  // 遗传算法

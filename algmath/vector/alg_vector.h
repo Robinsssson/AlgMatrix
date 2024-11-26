@@ -1,7 +1,9 @@
 #ifndef __ALG_VECTOR_H__
 #define __ALG_VECTOR_H__
 #include "../alg_inc.h"
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #define ALG_VECTOR_BASE_SIZE (32)
 /**
  * @brief 创建一个向量对象
@@ -56,7 +58,7 @@ ALG_MATH_API alg_state alg_vector_free(alg_vector *vec);
  * @param row 要提取的行索引
  * @return alg_vector* 指向创建的向量对象的指针，失败时返回 NULL
  */
-ALG_MATH_API alg_vector *alg_vector_from_matrix_row(const alg_matrix *matrix, int row);
+ALG_MATH_API alg_vector *alg_vector_from_matrix_row(alg_matrix *matrix, int row);
 
 /**
  * @brief 从矩阵的指定列创建向量
@@ -65,7 +67,7 @@ ALG_MATH_API alg_vector *alg_vector_from_matrix_row(const alg_matrix *matrix, in
  * @param col 要提取的列索引
  * @return alg_vector* 指向创建的向量对象的指针，失败时返回 NULL
  */
-ALG_MATH_API alg_vector *alg_vector_from_matrix_col(const alg_matrix *matrix, int col);
+ALG_MATH_API alg_vector *alg_vector_from_matrix_col(alg_matrix *matrix, int col);
 
 /**
  * @brief 打印向量的结果
@@ -74,5 +76,27 @@ ALG_MATH_API alg_vector *alg_vector_from_matrix_col(const alg_matrix *matrix, in
  * @return char* 指向创建的向量对象的指针，失败时返回 NULL
  */
 ALG_MATH_API char *alg_vector_print_str(const alg_vector *vector);
+/**
+ * @brief 获取vector sort的结果
+ *
+ * @param src_vector  指向原始向量对象的指针
+ * @param dest_vector 指向排序后的向量的指针，此处内存需要手动创建手动释放
+ * @param sort_index  指向排序过后的index变化值
+ * @param ptr_compare 在"alg_utils.h"中定义的函数
+ * @return char* 指向创建的向量对象的指针，失败时返回 NULL
+ */
+ALG_MATH_API alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_vector *dest_vector,
+                                            int *sort_index,
+                                            int (*ptr_compare)(const void *, const void *));
 
+/**
+ * @brief 输出数组切片
+ *
+ * @param vector 指向向量对象的指针
+ * @return char* 指向创建的向量对象的指针，失败时返回 NULL
+ */
+ALG_MATH_API alg_vector *alg_vector_slice(const alg_vector *vector, int range_l, int range_r);
+#ifdef __cplusplus
+}
+#endif
 #endif

@@ -1,5 +1,5 @@
 #include "pso.h"
-#include "../../algmath/algmath.h"
+#include "algmath.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>

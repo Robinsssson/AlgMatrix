@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-
 // 定义PSO算法的目标函数
 double test_function(alg_vector *vec) {
     // 确保向量的大小为2（二维空间）
@@ -23,12 +22,12 @@ double test_function(alg_vector *vec) {
 void test_pso() {
     // PSO参数设定
     int particle_number = 500; // 粒子数量
-    int dimensions = 2;       // 维度
-    double w = 0.5;           // 惯性权重
-    double c1 = 2.0;          // 个体学习因子
-    double c2 = 2.0;          // 全局学习因子
+    int dimensions = 2;        // 维度
+    double w = 0.5;            // 惯性权重
+    double c1 = 2.0;           // 个体学习因子
+    double c2 = 2.0;           // 全局学习因子
     int max_iterations = 5000; // 最大迭代次数
-
+    alg_memalloc_init(NULL);
     // 初始化PSO句柄，选择最小化问题
     pso_handle *pso = pso_init(particle_number, dimensions, w, c1, c2, test_function, PSO_USE_MIN);
 

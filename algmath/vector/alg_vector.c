@@ -1,21 +1,18 @@
 #include "alg_vector.h"
 #include "../matrix/alg_matrix.h"
+#include "../memalloc/alg_memalloc.h"
+#include "../utils/alg_utils.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 alg_vector *alg_vector_create(int size, alg_val_type init_val) {
-    alg_vector *vec = ALG_MALLOC(sizeof(alg_vector));
+    int t = ceil((double)size / ALG_VECTOR_BASE_SIZE);
+    alg_vector *vec =
+        ALG_MALLOC(sizeof(alg_vector) + sizeof(alg_val_type) * t * ALG_VECTOR_BASE_SIZE);
     if (vec == NULL)
         return NULL;
-
-    int t = ceil((double)size / ALG_VECTOR_BASE_SIZE);
-    vec->vector = ALG_MALLOC(sizeof(alg_val_type) * t * ALG_VECTOR_BASE_SIZE);
-    if (vec->vector == NULL) {
-        ALG_FREE(vec);
-        return NULL;
-    }
 
     vec->caps = t * ALG_VECTOR_BASE_SIZE;
     vec->size = size;
@@ -65,11 +62,21 @@ alg_state alg_vector_insert(alg_vector *vec, int pos, alg_val_type val) {
     // Check if the vector needs to be resized
     if (vec->size >= vec->caps) {
         int new_caps = vec->caps + ALG_VECTOR_BASE_SIZE;
-        alg_val_type *new_vector = ALG_REALLOC(vec->vector, new_caps * sizeof(alg_val_type));
-        if (new_vector == NULL)
+
+        // Create a new vector with expanded capacity
+        alg_vector *new_vec =
+            (alg_vector *)malloc(sizeof(alg_vector) + new_caps * sizeof(alg_val_type));
+        if (new_vec == NULL)
             return ALG_ERROR; // Memory allocation failed
-        vec->vector = new_vector;
-        vec->caps = new_caps;
+
+        // Copy the old data to the new vector
+        memcpy(new_vec->vector, vec->vector, vec->size * sizeof(alg_val_type));
+        new_vec->size = vec->size;
+        new_vec->caps = new_caps;
+
+        // Update the original vector pointer to the new one
+        *vec = *new_vec;
+        free(new_vec); // Don't forget to free the temporary new_vec
     }
 
     // Move elements to the right to make space for the new value
@@ -77,21 +84,18 @@ alg_state alg_vector_insert(alg_vector *vec, int pos, alg_val_type val) {
     // Insert the new value
     vec->vector[pos] = val;
     vec->size++;
-
     return ALG_OK;
 }
 
 alg_state alg_vector_free(alg_vector *vec) {
     if (vec == NULL)
         return ALG_ERROR;
-    ALG_FREE(vec->vector);
     ALG_FREE(vec);
-
     return ALG_OK;
 }
 
-alg_vector *alg_vector_from_matrix_row(const alg_matrix *matrix, int row) {
-    alg_vector *vec = alg_vector_create(matrix->col, GLOBAL_INIT_VAL);
+alg_vector *alg_vector_from_matrix_row(alg_matrix *matrix, int row) {
+    alg_vector *vec = alg_vector_create(matrix->col, ALG_INIT_VAL);
     if (vec == NULL)
         return NULL;
     for (int i = 0; i < matrix->col; i++)
@@ -99,8 +103,8 @@ alg_vector *alg_vector_from_matrix_row(const alg_matrix *matrix, int row) {
     return vec;
 }
 
-alg_vector *alg_vector_from_matrix_col(const alg_matrix *matrix, int col) {
-    alg_vector *vec = alg_vector_create(matrix->row, GLOBAL_INIT_VAL);
+alg_vector *alg_vector_from_matrix_col(alg_matrix *matrix, int col) {
+    alg_vector *vec = alg_vector_create(matrix->row, ALG_INIT_VAL);
     if (vec == NULL)
         return NULL;
     for (int i = 0; i < matrix->row; i++)
@@ -122,4 +126,70 @@ char *alg_vector_print_str(const alg_vector *vector) {
     }
     pos += snprintf(str + pos, buf_size - pos, "]\n");
     return str;
+}
+
+alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_vector *dest_vector,
+                               int *sort_index, int (*ptr_compare)(const void *, const void *)) {
+    // Ensure the destination vector has enough space to hold the source data
+    if (dest_vector->caps < src_vector->size) {
+        // wait to fill
+    }
+
+    // Copy data from source to destination
+    dest_vector->size = src_vector->size;
+    memcpy(dest_vector->vector, src_vector->vector, sizeof(alg_val_type) * src_vector->size);
+
+    // Sort the destination vector
+    qsort(dest_vector->vector, (size_t)dest_vector->size, sizeof(alg_val_type), ptr_compare);
+
+    // If sort_index is provided, fill it with the original indices
+    if (sort_index != NULL) {
+        for (int i = 0; i < dest_vector->size; i++) {
+            for (int j = 0; j < src_vector->size; j++) {
+                // Floating-point comparison with tolerance
+                if (fabs(dest_vector->vector[i] - src_vector->vector[j]) < 1e-9) {
+                    sort_index[i] = j;
+                    break;
+                }
+            }
+        }
+    }
+
+    return ALG_OK;
+}
+// {1, 2, 3, 4, 5, 6} size = 6
+// [1:2] {2}
+// [1:5] {2, 3, 4, 5}
+// [1:6] {2, 3, 4, 5, 6}
+// [-2:-1] {5} => [5:6]
+alg_vector *alg_vector_slice(const alg_vector *vector, int range_l, int range_r) {
+    // 默认处理“全部范围”的情况
+    if (range_l == ALG_ALL_RANGE)
+        range_l = 0;
+    if (range_r == ALG_ALL_RANGE)
+        range_r = vector->size;
+
+    // 处理负索引
+    if (range_l < 0)
+        range_l = vector->size + range_l;
+    if (range_r < 0)
+        range_r = vector->size + range_r;
+
+    // 检查索引有效性
+    if (range_l < 0 || range_r < 0 || range_l >= vector->size || range_r > vector->size
+        || range_l >= range_r)
+        return NULL;
+
+    // 计算切片的长度
+    int len = range_r - range_l;
+
+    // 创建返回的新向量
+    alg_vector *ret_vec = alg_vector_create(len, 0);
+    if (ret_vec == NULL)
+        return NULL;
+
+    // 复制源向量的切片到新向量
+    memcpy(ret_vec->vector, vector->vector + range_l, len * sizeof(alg_val_type));
+
+    return ret_vec;
 }

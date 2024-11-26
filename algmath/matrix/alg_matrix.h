@@ -1,7 +1,7 @@
 #ifndef __ALG_MATRIX__H__
 #define __ALG_MATRIX__H__
 #include "../alg_inc.h"
-#include "../vector/alg_vector.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -35,7 +35,7 @@ ALG_MATH_API alg_state alg_matrix_set_val(alg_matrix *matrix, int row, int col, 
  * @param col 列索引
  * @return 返回指定位置的值的指针，如果索引越界则返回 NULL
  */
-ALG_MATH_API alg_val_type *alg_matrix_get_pos_val(const alg_matrix *matrix, int row, int col);
+ALG_MATH_API alg_val_type *alg_matrix_get_pos_val(alg_matrix *matrix, int row, int col);
 
 /**
  * @brief 获取矩阵指定索引的值的指针
@@ -44,7 +44,7 @@ ALG_MATH_API alg_val_type *alg_matrix_get_pos_val(const alg_matrix *matrix, int 
  * @param index 元素的线性索引
  * @return 返回指定索引的值的指针，如果索引越界则返回 NULL
  */
-ALG_MATH_API alg_val_type *alg_matrix_get_index_val(const alg_matrix *matrix, int index);
+ALG_MATH_API alg_val_type *alg_matrix_get_index_val(alg_matrix *matrix, int index);
 
 /**
  * @brief 复制矩阵
@@ -97,7 +97,7 @@ ALG_MATH_API alg_matrix *alg_matrix_dot_number(const alg_matrix *mat1, const dou
  * @param mat2 指向第二个矩阵的指针
  * @return 返回指向结果矩阵的指针，如果乘法失败则返回 NULL
  */
-ALG_MATH_API alg_matrix *alg_matrix_times(const alg_matrix *mat1, const alg_matrix *mat2);
+ALG_MATH_API alg_matrix *alg_matrix_times(alg_matrix *mat1, alg_matrix *mat2);
 
 /**
  * @brief 就地矩阵加法
@@ -156,7 +156,7 @@ ALG_MATH_API alg_state alg_matrix_free(alg_matrix *matrix);
  * @param mat 指向要转置的矩阵的指针
  * @return 返回指向转置后矩阵的指针，如果转置失败则返回 NULL
  */
-ALG_MATH_API alg_matrix *alg_matrix_transpose(const alg_matrix *mat);
+ALG_MATH_API alg_matrix *alg_matrix_transpose(alg_matrix *mat);
 
 /**
  * @brief 就地矩阵转置
