@@ -1,6 +1,3 @@
-add_toolchains("mingw")
-add_requires("gsl")
-
 target("algmath")
     set_kind("shared")
     add_files("algmath/*/*.c")
@@ -8,7 +5,7 @@ target("algmath")
 
 target("pso")
     set_kind("binary")
-    add_files("pso/c/*.c")
+    add_files("src/pso/c/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
     

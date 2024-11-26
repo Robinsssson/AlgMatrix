@@ -1,6 +1,6 @@
 #ifndef __PSO__H__
 #define __PSO__H__
-#include "../../algmath/algmath.h"
+#include "algmath.h"
 typedef double (*pso_aim_function)(alg_vector *);
 typedef enum {
     PSO_USE_MAX,
