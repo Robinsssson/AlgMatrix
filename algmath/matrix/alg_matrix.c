@@ -13,11 +13,6 @@ alg_matrix *alg_matrix_create(int row, int col) {
 
     mat->col = col;
     mat->row = row;
-    // mat->mat = (alg_val_type *)ALG_CALLOC(row * col, sizeof(alg_val_type)); // 分配正确大小的内存
-    // if (mat->mat == NULL) {
-    //     ALG_FREE(mat);
-    //     return NULL;
-    // }
     return mat;
 }
 
