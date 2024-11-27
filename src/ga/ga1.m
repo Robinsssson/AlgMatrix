@@ -37,7 +37,7 @@ for gen = 1:max_gen
         child2 = p2;
         child1(crossover_point:end) = p2(crossover_point:end);
         child2(crossover_point:end) = p1(crossover_point:end);
-        offspring = [offspring; child1; child2];
+        offspring = [offspring; child1; child2];  %#ok<*AGROW>%#ok<AGROW>
     end
     
     % 变异：变异操作，随机改变个体的一部分

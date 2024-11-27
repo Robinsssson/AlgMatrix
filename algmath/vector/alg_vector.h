@@ -21,7 +21,7 @@ ALG_MATH_API alg_vector *alg_vector_create(int size, alg_val_type init_val);
  * @param pos 要获取的值的位置
  * @return alg_val_type* 指向指定位置值的指针，失败时返回 NULL
  */
-ALG_MATH_API alg_val_type *alg_vector_get_val(alg_vector *vec, int pos);
+ALG_MATH_API const alg_val_type *alg_vector_get_val(const alg_vector *vec, int pos);
 
 /**
  * @brief 设置向量指定位置的值
@@ -41,7 +41,7 @@ ALG_MATH_API alg_state alg_vector_set_val(alg_vector *vec, int pos, alg_val_type
  * @param val 要插入的值
  * @return alg_state 返回操作状态，成功时为 ALG_OK，失败时为 ALG_ERROR
  */
-ALG_MATH_API alg_state alg_vector_insert(alg_vector *vec, int pos, alg_val_type val);
+ALG_MATH_API alg_state alg_vector_insert(alg_vector **vec, int pos, alg_val_type val);
 
 /**
  * @brief 释放向量占用的内存
@@ -85,8 +85,7 @@ ALG_MATH_API char *alg_vector_print_str(const alg_vector *vector);
  * @param ptr_compare 在"alg_utils.h"中定义的函数
  * @return char* 指向创建的向量对象的指针，失败时返回 NULL
  */
-ALG_MATH_API alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_vector *dest_vector,
-                                            int *sort_index,
+ALG_MATH_API alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_vector *dest_vector, int *sort_index,
                                             int (*ptr_compare)(const void *, const void *));
 
 /**
@@ -96,6 +95,21 @@ ALG_MATH_API alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_ve
  * @return char* 指向创建的向量对象的指针，失败时返回 NULL
  */
 ALG_MATH_API alg_vector *alg_vector_slice(const alg_vector *vector, int range_l, int range_r);
+
+/**
+ * @brief 输出一个vector的拷贝对象
+ *
+ * @param vector 指向向量对象的指针
+ * @return alg_vector* 指向创建的向量对象的指针，失败时返回 NULL
+ */
+ALG_MATH_API alg_vector *alg_vector_create_like(const alg_vector *vector);
+enum alg_vector_concat {
+    ALG_VECTOR_CONCAT_L,
+    ALG_VECTOR_CONCAT_R,
+};
+ALG_MATH_API alg_state alg_vector_ensure_caps_inplace(alg_vector **ptr_vector);
+
+ALG_MATH_API alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vector *src_vector, enum alg_vector_concat concat);
 #ifdef __cplusplus
 }
 #endif

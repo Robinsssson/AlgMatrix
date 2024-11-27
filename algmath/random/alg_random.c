@@ -1,7 +1,7 @@
 #include "alg_random.h"
 #include <math.h>
 #include <stdlib.h>
-
+#define PI (3.1415926535)
 
 int alg_random_int(int min, int max) {
     if (min > max) {
@@ -9,8 +9,9 @@ int alg_random_int(int min, int max) {
         min = max;
         max = temp;
     }
-    return min + rand() % (max - min + 1);
+    return min + rand() % (max - min);
 }
+
 double alg_random_float64(double min, double max) {
     if (min > max) {
         double temp = min;
@@ -27,7 +28,7 @@ double alg_random_normal(double mu, double sigma) {
     double u2 = rand() / (double)RAND_MAX; // [0, 1) 均匀分布
 
     // Box-Muller 变换
-    double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * M_PI * u2);
+    double z0 = sqrt(-2.0 * log(u1)) * cos(2.0 * PI * u2);
 
     // 调整为期望均值和标准差
     return mu + z0 * sigma;

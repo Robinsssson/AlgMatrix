@@ -1,5 +1,6 @@
 #include "algmath.h"
 #include "test_framework.h"
+#include <stdio.h>
 
 // Test: Create a vector with given size and initial value
 int test_alg_vector_create() {
@@ -53,7 +54,7 @@ int test_alg_vector_insert() {
     if (vec == NULL)
         return TEST_FAILED;
 
-    if (alg_vector_insert(vec, 2, 20.0f) != ALG_OK || *alg_vector_get_val(vec, 2) != 20.0f) {
+    if (alg_vector_insert(&vec, 2, 20.0f) != ALG_OK || *alg_vector_get_val(vec, 2) != 20.0f) {
         alg_vector_free(vec);
         return TEST_FAILED;
     }
@@ -118,8 +119,8 @@ int test_alg_vector_slice() {
         return TEST_FAILED;
     }
 
-    if (sliced_vec->size != 3 || *alg_vector_get_val(sliced_vec, 0) != 2
-        || *alg_vector_get_val(sliced_vec, 1) != 3 || *alg_vector_get_val(sliced_vec, 2) != 4) {
+    if (sliced_vec->size != 3 || *alg_vector_get_val(sliced_vec, 0) != 2 || *alg_vector_get_val(sliced_vec, 1) != 3
+        || *alg_vector_get_val(sliced_vec, 2) != 4) {
         alg_vector_free(vec);
         alg_vector_free(sliced_vec);
         return TEST_FAILED;
@@ -129,13 +130,63 @@ int test_alg_vector_slice() {
     alg_vector_free(sliced_vec);
     return TEST_PASSED;
 }
+// Test: Concatenate two vectors (right and left concat)
+int test_alg_vector_concat_inplace() {
+    // Create two vectors
+    alg_vector *vec1 = alg_vector_create(3, 1.0f); // {1.0f, 1.0f, 1.0f}
+    alg_vector_set_val(vec1, 2, 8.0f);
+    alg_vector *vec2 = alg_vector_create(2, 2.0f); // {2.0f, 2.0f}
+    if (vec1 == NULL || vec2 == NULL)
+        return TEST_FAILED;
+
+    // Perform right concatenation (vec1 + vec2)
+    alg_vector_concat_inplace(&vec1, vec2, ALG_VECTOR_CONCAT_R);
+    LOGGING("Concat1 Over");
+    // Check the size of the concatenated vector
+    if (vec1->size != 5) {
+        alg_vector_free(vec1);
+        alg_vector_free(vec2);
+        return TEST_FAILED;
+    }
+
+    // Check the values after right concatenation: {1.0f, 1.0f, 1.0f, 2.0f, 2.0f}
+    if (*alg_vector_get_val(vec1, 0) != 1.0f || *alg_vector_get_val(vec1, 1) != 1.0f || *alg_vector_get_val(vec1, 2) != 8.0f
+        || *alg_vector_get_val(vec1, 3) != 2.0f || *alg_vector_get_val(vec1, 4) != 2.0f) {
+        alg_vector_free(vec1);
+        alg_vector_free(vec2);
+        return TEST_FAILED;
+    }
+    LOGGING("Concat1 TEST Over");
+    // Perform left concatenation (vec1 + vec2), so vec1 will have the values from vec2 prepended
+    alg_vector_concat_inplace(&vec1, vec2, ALG_VECTOR_CONCAT_L);
+    LOGGING("Concat2 Over");
+    // Check the size of the concatenated vector
+    if (vec1->size != 7) {
+        alg_vector_free(vec1);
+        alg_vector_free(vec2);
+        return TEST_FAILED;
+    }
+
+    // Check the values after left concatenation: {2.0f, 2.0f, 1.0f, 1.0f, 1.0f, 2.0f, 2.0f}
+    if (*alg_vector_get_val(vec1, 0) != 2.0f || *alg_vector_get_val(vec1, 1) != 2.0f || *alg_vector_get_val(vec1, 2) != 1.0f
+        || *alg_vector_get_val(vec1, 3) != 1.0f || *alg_vector_get_val(vec1, 4) != 8.0f || *alg_vector_get_val(vec1, 5) != 2.0f
+        || *alg_vector_get_val(vec1, 6) != 2.0f) {
+        alg_vector_free(vec1);
+        alg_vector_free(vec2);
+        return TEST_FAILED;
+    }
+
+    // Free the vectors
+    alg_vector_free(vec1);
+    alg_vector_free(vec2);
+
+    return TEST_PASSED;
+}
 
 // Main function to run all tests
 int TEST_MAIN() {
-    TEST_SCOPE_NEGIN = {
-        INSERT_TEST(test_alg_vector_create),  INSERT_TEST(test_alg_vector_get_val),
-        INSERT_TEST(test_alg_vector_set_val), INSERT_TEST(test_alg_vector_insert),
-        INSERT_TEST(test_alg_vector_free),    INSERT_TEST(test_alg_vector_sort_copy),
-        INSERT_TEST(test_alg_vector_slice)};
+    TEST_SCOPE_NEGIN = {INSERT_TEST(test_alg_vector_create), INSERT_TEST(test_alg_vector_get_val),       INSERT_TEST(test_alg_vector_set_val),
+                        INSERT_TEST(test_alg_vector_insert), INSERT_TEST(test_alg_vector_free),          INSERT_TEST(test_alg_vector_sort_copy),
+                        INSERT_TEST(test_alg_vector_slice),  INSERT_TEST(test_alg_vector_concat_inplace)};
     TEST_SCOPE_END
 }

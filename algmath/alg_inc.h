@@ -38,7 +38,7 @@ struct __alg_vector {
     int size;
     int caps;
     alg_val_type vector[];
-};                          //动态数组
+}; // 动态数组
 
 typedef struct __alg_vector alg_vector;
 typedef struct __alg_matrix alg_matrix;
@@ -52,18 +52,19 @@ typedef struct __alg_matrix alg_matrix;
 #define ALG_LOG_MSG_FREE_NULL "Attempted to free a NULL vector."
 
 #if USE_LOG
-#define LOGGING(str)                                                                               \
-    printf("%s, in file %s, function %s, line %d\n", str, __FILE__, __FUNCTION__, __LINE__);
+// 使用可变参数的日志宏
+#define LOGGING(fmt, ...) \
+    printf("[LOGGING]: " fmt ", in file %s, function %s, line %d\n", ##__VA_ARGS__, __FILE__, __FUNCTION__, __LINE__);
 #else
-#define LOGGING(str)
+#define LOGGING(fmt, ...) // 如果没有启用日志记录，空定义
 #endif
+
 typedef struct {
     void *(*alg_memalloc_malloc)(unsigned long long);
     void (*alg_memalloc_free)(void *);
     void *(*alg_memalloc_realloc)(void *, unsigned long long);
     void *(*alg_memalloc_calloc)(unsigned long long, unsigned long long);
 } alg_memalloc_hook;
-
 
 #ifdef __cplusplus
 }

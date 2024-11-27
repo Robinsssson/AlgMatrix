@@ -1,5 +1,6 @@
 #include "algmath.h"
 #include "test_framework.h"
+#include <stdio.h>
 
 // Test: Create a matrix with given rows and columns
 int test_alg_matrix_create() {
@@ -201,6 +202,71 @@ int test_alg_matrix_transpose() {
     alg_matrix_free(transposed_mat);
     return TEST_PASSED;
 }
+#define STR(n) str##n
+#define __PRINT(matrix, str)                                                                       \
+    do {                                                                                           \
+        char *str = alg_matrix_print_str(matrix);                                                  \
+        printf(#matrix " is %s", str);                                                             \
+        ALG_FREE(str);                                                                             \
+    } while (0)
+
+// 改进后的版本，避免参数冲突并且增强可读性
+#define PRINT(matrix) print_matrix(matrix, #matrix)
+
+void print_matrix(alg_matrix *matrix, char strname[]) {
+    char *str = alg_matrix_print_str(matrix); // 获取矩阵的字符串表示
+    if (str != NULL) {
+        printf("%s is %s", strname, str);
+        ALG_FREE(str); // 假设算法库使用 ALG_FREE 来释放内存
+    }
+}
+
+int test_alg_matrix_concat() {
+    // 创建两个矩阵
+    alg_matrix *mat1 = alg_matrix_create(2, 3);
+    if (mat1 == NULL)
+        return TEST_FAILED;
+    alg_matrix_set_val(mat1, 0, 0, 1.0f);
+    alg_matrix_set_val(mat1, 0, 1, 2.0f);
+    alg_matrix_set_val(mat1, 0, 2, 3.0f);
+    alg_matrix_set_val(mat1, 1, 0, 4.0f);
+    alg_matrix_set_val(mat1, 1, 1, 5.0f);
+    alg_matrix_set_val(mat1, 1, 2, 6.0f);
+
+    PRINT(mat1);
+
+    alg_matrix *mat2 = alg_matrix_create(2, 2);
+    if (mat2 == NULL) {
+        alg_matrix_free(mat1);
+        return TEST_FAILED;
+    }
+    alg_matrix_set_val(mat2, 0, 0, 7.0f);
+    alg_matrix_set_val(mat2, 0, 1, 8.0f);
+    alg_matrix_set_val(mat2, 1, 0, 9.0f);
+    alg_matrix_set_val(mat2, 1, 1, 10.0f);
+    PRINT(mat2);
+    // 测试左拼接（CONCAT_AXIS_LX）
+    alg_state ret = alg_matrix_concat(&mat1, mat2, CONCAT_AXIS_LX);
+    LOGGING("RET of LEFT is %d", ret);
+    PRINT(mat1);
+    if (*alg_matrix_get_pos_val(mat1, 0, 0) != 7.0f
+        || *alg_matrix_get_pos_val(mat1, 0, 1) != 8.0f
+        || *alg_matrix_get_pos_val(mat1, 0, 2) != 1.0f
+        || *alg_matrix_get_pos_val(mat1, 0, 3) != 2.0f
+        || *alg_matrix_get_pos_val(mat1, 0, 4) != 3.0f
+        || *alg_matrix_get_pos_val(mat1, 1, 0) != 9.0f
+        || *alg_matrix_get_pos_val(mat1, 1, 1) != 10.0f
+        || *alg_matrix_get_pos_val(mat1, 1, 2) != 4.0f
+        || *alg_matrix_get_pos_val(mat1, 1, 3) != 5.0f
+        || *alg_matrix_get_pos_val(mat1, 1, 4) != 6.0f) {
+        alg_matrix_free(mat1);
+        alg_matrix_free(mat2);
+        return TEST_FAILED;
+    }
+    alg_matrix_free(mat1);
+    alg_matrix_free(mat2);
+    return TEST_PASSED;
+}
 
 // Test: Free matrix memory
 int test_alg_matrix_free() {
@@ -218,6 +284,7 @@ int TEST_MAIN() {
         INSERT_TEST(test_alg_matrix_create),        INSERT_TEST(test_alg_matrix_add),
         INSERT_TEST(test_alg_matrix_dot_number),    INSERT_TEST(test_alg_matrix_free),
         INSERT_TEST(test_alg_matrix_get_index_val), INSERT_TEST(test_alg_matrix_set_and_get_val),
-        INSERT_TEST(test_alg_matrix_subtraction),   INSERT_TEST(test_alg_matrix_transpose)};
+        INSERT_TEST(test_alg_matrix_subtraction),   INSERT_TEST(test_alg_matrix_transpose),
+        INSERT_TEST(test_alg_matrix_concat)};
     TEST_SCOPE_END
 }

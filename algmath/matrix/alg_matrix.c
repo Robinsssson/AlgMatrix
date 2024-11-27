@@ -7,8 +7,7 @@
 #include <time.h>
 
 alg_matrix *alg_matrix_create(int row, int col) {
-    alg_matrix *mat =
-        (alg_matrix *)ALG_MALLOC(sizeof(alg_matrix) + sizeof(alg_val_type) * row * col);
+    alg_matrix *mat = (alg_matrix *)ALG_MALLOC(sizeof(alg_matrix) + sizeof(alg_val_type) * row * col);
     if (mat == NULL)
         return NULL;
 
@@ -35,7 +34,7 @@ alg_state alg_matrix_set_val(alg_matrix *matrix, int row, int col, alg_val_type 
     return ALG_OK;
 }
 
-alg_val_type *alg_matrix_get_pos_val(alg_matrix *matrix, int row, int col) {
+const alg_val_type *alg_matrix_get_pos_val(const alg_matrix *matrix, int row, int col) {
 #if USE_ASSERT
     assert(matrix != NULL);
 #else
@@ -47,7 +46,19 @@ alg_val_type *alg_matrix_get_pos_val(alg_matrix *matrix, int row, int col) {
     return &matrix->mat[row * matrix->col + col];
 }
 
-alg_val_type *alg_matrix_get_index_val(alg_matrix *matrix, int index) {
+ALG_MATH_API alg_val_type *alg_matrix_get_pos_mutval(alg_matrix *matrix, int row, int col) {
+#if USE_ASSERT
+    assert(matrix != NULL);
+#else
+    if (matrix == NULL)
+        return NULL;
+#endif
+    if (row >= matrix->row || col >= matrix->col)
+        return NULL; // 检查索引是否越界
+    return &matrix->mat[row * matrix->col + col];
+}
+
+const alg_val_type *alg_matrix_get_index_val(const alg_matrix *matrix, int index) {
 #if USE_ASSERT
     assert(matrix != NULL);
 #else
@@ -156,10 +167,9 @@ alg_matrix *alg_matrix_times(alg_matrix *mat1, alg_matrix *mat2) {
 
     for (int i = 0; i < mat1->row; i++) {
         for (int j = 0; j < mat2->col; j++) {
-            alg_val_type *val = alg_matrix_get_pos_val(ret, i, j);
+            alg_val_type *val = alg_matrix_get_pos_mutval(ret, i, j);
             for (int k = 0; k < mat1->col; k++) {
-                *val +=
-                    (*alg_matrix_get_pos_val(mat1, i, k)) * (*alg_matrix_get_pos_val(mat2, k, j));
+                *val += (*alg_matrix_get_pos_val(mat1, i, k)) * (*alg_matrix_get_pos_val(mat2, k, j));
             }
         }
     }
@@ -329,4 +339,113 @@ void alg_matrix_clamp(alg_matrix *matrix, double min_val, double max_val) {
         else if (matrix->mat[i] > max_val)
             matrix->mat[i] = max_val;
     }
+}
+
+#define INTERATOR_MATRIX(matrix, irow, icol)                                                                                                         \
+    for (int irow = 0; irow < (matrix)->row; irow++)                                                                                                   \
+        for (int icol = 0; icol < (matrix)->col; icol++)
+
+alg_state alg_matrix_concat(alg_matrix **dest_matrix, alg_matrix *src_matrix, enum alg_matrix_concat concat) {
+    if (dest_matrix == NULL || src_matrix == NULL) {
+        return ALG_ERROR;
+    }
+
+    // 确定拼接方向并检查列或行数的匹配
+    int is_row_match = ((*dest_matrix)->row == src_matrix->row);
+    int is_col_match = ((*dest_matrix)->col == src_matrix->col);
+
+    // 扩容计算（目标矩阵需要加上源矩阵的行/列）
+    size_t new_size = 0;
+    switch (concat) {
+        case CONCAT_AXIS_LX: // 左侧拼接，行数相同，列数增加
+        case CONCAT_AXIS_RX: // 右侧拼接，行数相同，列数增加
+            if (!is_row_match)
+                return ALG_ERROR;
+            new_size = sizeof(alg_matrix) + ((*dest_matrix)->row * ((*dest_matrix)->col + src_matrix->col)) * sizeof(alg_val_type);
+            break;
+        case CONCAT_AXIS_UY: // 上侧拼接，列数相同，行数增加
+        case CONCAT_AXIS_DY: // 下侧拼接，列数相同，行数增加
+            if (!is_col_match)
+                return ALG_ERROR;
+            new_size = sizeof(alg_matrix) + (((*dest_matrix)->row + src_matrix->row) * (*dest_matrix)->col) * sizeof(alg_val_type);
+            break;
+        default:
+            return ALG_ERROR; // 无效的拼接方向
+    }
+    alg_matrix* copy_matrix = alg_matrix_copy(*dest_matrix);
+    // 扩容目标矩阵
+    *dest_matrix = ALG_REALLOC(*dest_matrix, new_size);
+    // 更新目标矩阵的行数和列数
+    if (concat == CONCAT_AXIS_LX || concat == CONCAT_AXIS_RX) {
+        (*dest_matrix)->col += src_matrix->col;
+    } else {
+        (*dest_matrix)->row += src_matrix->row;
+    }
+    if (!dest_matrix)
+        return ALG_ERROR; // 内存分配失败
+    
+    // 根据拼接方向执行数据搬移
+    switch (concat) {
+        case CONCAT_AXIS_LX: // 左侧拼接，行数相同，列数增加
+            INTERATOR_MATRIX(*dest_matrix, i, j) {
+                // 判断是否在源矩阵的列范围内
+                if (j < src_matrix->col) {
+                    // 如果在源矩阵列范围内，从源矩阵获取值
+                    const alg_val_type val = *alg_matrix_get_pos_val(src_matrix, i, j);
+                    alg_matrix_set_val(*dest_matrix, i, j, val);
+                } else {
+                    // 否则，从目标矩阵获取值，位置偏移源矩阵的列数
+                    const alg_val_type val = *alg_matrix_get_pos_val(copy_matrix, i, j - src_matrix->col);
+                    alg_matrix_set_val(*dest_matrix, i, j, val);
+                }
+            }
+            break;
+
+        case CONCAT_AXIS_RX: // 右侧拼接，行数相同，列数增加
+            INTERATOR_MATRIX(*dest_matrix, i, j) {
+                // 判断是否在目标矩阵的列范围外
+                if (j >= (*dest_matrix)->col) {
+                    // 如果超出目标矩阵的列范围，从源矩阵获取值，位置偏移目标矩阵的列数
+                    const alg_val_type val = *alg_matrix_get_pos_val(src_matrix, i, j - (*dest_matrix)->col);
+                    alg_matrix_set_val((*dest_matrix), i, j, val);
+                } else {
+                    // 否则，保持原位置，从目标矩阵获取值
+                    const alg_val_type val = *alg_matrix_get_pos_val(copy_matrix, i, j);
+                    alg_matrix_set_val((*dest_matrix), i, j, val);
+                }
+            }
+            break;
+
+        case CONCAT_AXIS_UY: // 上侧拼接，列数相同，行数增加
+            INTERATOR_MATRIX(*dest_matrix, i, j) {
+                // 判断是否在源矩阵的行范围内
+                if (i < src_matrix->row) {
+                    // 如果在源矩阵行范围内，从源矩阵获取值
+                    const alg_val_type val = *alg_matrix_get_pos_val(src_matrix, i, j);
+                    alg_matrix_set_val(*dest_matrix, i, j, val);
+                } else {
+                    // 否则，从目标矩阵获取值，位置偏移源矩阵的行数
+                    const alg_val_type val = *alg_matrix_get_pos_val(copy_matrix, i - src_matrix->row, j);
+                    alg_matrix_set_val(*dest_matrix, i, j, val);
+                }
+            }
+            break;
+
+        case CONCAT_AXIS_DY: // 下侧拼接，列数相同，行数增加
+            INTERATOR_MATRIX(*dest_matrix, i, j) {
+                // 判断是否在目标矩阵的行范围外
+                if (i >= (*dest_matrix)->row) {
+                    // 如果超出目标矩阵的行范围，从源矩阵获取值，位置偏移目标矩阵的行数
+                    const alg_val_type val = *alg_matrix_get_pos_val(src_matrix, i - (*dest_matrix)->row, j);
+                    alg_matrix_set_val((*dest_matrix), i, j, val);
+                } else {
+                    // 否则，保持原位置，从目标矩阵获取值
+                    const alg_val_type val = *alg_matrix_get_pos_val(copy_matrix, i, j);
+                    alg_matrix_set_val((*dest_matrix), i, j, val);
+                }
+            }
+            break;
+    }
+    alg_matrix_free(copy_matrix);
+    return ALG_OK;
 }

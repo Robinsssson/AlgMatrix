@@ -35,8 +35,17 @@ ALG_MATH_API alg_state alg_matrix_set_val(alg_matrix *matrix, int row, int col, 
  * @param col 列索引
  * @return 返回指定位置的值的指针，如果索引越界则返回 NULL
  */
-ALG_MATH_API alg_val_type *alg_matrix_get_pos_val(alg_matrix *matrix, int row, int col);
+ALG_MATH_API const alg_val_type *alg_matrix_get_pos_val(const alg_matrix *matrix, int row, int col);
 
+/**
+ * @brief 获取矩阵指定位置的值的指针
+ *
+ * @param matrix 指向矩阵对象的指针
+ * @param row 行索引
+ * @param col 列索引
+ * @return 返回指定位置的值的指针，如果索引越界则返回 NULL
+ */
+ALG_MATH_API alg_val_type *alg_matrix_get_pos_mutval(alg_matrix *matrix, int row, int col);
 /**
  * @brief 获取矩阵指定索引的值的指针
  *
@@ -44,7 +53,7 @@ ALG_MATH_API alg_val_type *alg_matrix_get_pos_val(alg_matrix *matrix, int row, i
  * @param index 元素的线性索引
  * @return 返回指定索引的值的指针，如果索引越界则返回 NULL
  */
-ALG_MATH_API alg_val_type *alg_matrix_get_index_val(alg_matrix *matrix, int index);
+ALG_MATH_API const alg_val_type *alg_matrix_get_index_val(const alg_matrix *matrix, int index);
 
 /**
  * @brief 复制矩阵
@@ -194,6 +203,14 @@ ALG_MATH_API void alg_matrix_fill_random(alg_matrix *matrix, double min_val, dou
  */
 ALG_MATH_API void alg_matrix_clamp(alg_matrix *matrix, double min_val, double max_val);
 
+enum alg_matrix_concat {
+    CONCAT_AXIS_LX,
+    CONCAT_AXIS_RX,
+    CONCAT_AXIS_UY,
+    CONCAT_AXIS_DY,
+};
+
+ALG_MATH_API alg_state alg_matrix_concat(alg_matrix **dest_matrix, alg_matrix *src_matrix, enum alg_matrix_concat);
 #ifdef __cplusplus
 }
 #endif
