@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <time.h>
 
-
 // 示例适应度函数：目标是最大化 x^2 + y^2
 double fitness_function(alg_vector *individual) {
     double x = *alg_vector_get_val(individual, 0); // 获取第一个基因
@@ -14,18 +13,18 @@ double fitness_function(alg_vector *individual) {
     double l = *alg_vector_get_val(individual, 4); // 获取第二个基因
     double m = *alg_vector_get_val(individual, 5); // 获取第二个基因
 
-    return (x * x + y * y + z * z + k * k + l * l + m * m);                       // 目标是最大化 x^2 + y^2
+    return (x * x + y * y + z * z + k * k + l * l + m * m); // 目标是最大化 x^2 + y^2
 }
 
 // 主函数：初始化GA并运行
 int main() {
     // 遗传算法参数
     int pop_size = 100;          // 种群大小
-    double mutation_rate = 0.01; // 变异率
+    double mutation_rate = 0.4;  // 变异率
     double crossover_rate = 0.5; // 交叉率
     int args_number = 6;         // 每个个体的基因数（假设我们有x和y两个基因）
-    double var_max = 10.0;       // 基因的最大值
-    double var_min = -10.0;      // 基因的最小值
+    double var_max = 100.0;      // 基因的最大值
+    double var_min = -100.0;     // 基因的最小值
     srand(time(0));
     // 初始化GA
     ga_handle *ga = ga_init(pop_size, mutation_rate, crossover_rate, fitness_function, args_number, var_max, var_min);

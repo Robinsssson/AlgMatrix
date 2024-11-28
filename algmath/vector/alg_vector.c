@@ -8,7 +8,7 @@
 #include <string.h>
 
 alg_vector *alg_vector_create(int size, alg_val_type init_val) {
-    int t = ceil((double)size / ALG_VECTOR_BASE_SIZE);
+    int t = size / ALG_VECTOR_BASE_SIZE + 1;
     alg_vector *vec = ALG_MALLOC(sizeof(alg_vector) + sizeof(alg_val_type) * t * ALG_VECTOR_BASE_SIZE);
     if (vec == NULL)
         return NULL;
@@ -59,31 +59,14 @@ alg_state alg_vector_insert(alg_vector **vec, int pos, alg_val_type val) {
         return ALG_ERROR;
 
     // Check if the vector needs to be resized
-    if ((*vec)->size >= (*vec)->caps) {
-        int new_caps = (*vec)->caps + ALG_VECTOR_BASE_SIZE;
-
-        // Create a new vector with expanded capacity
-        alg_vector *new_vec = (alg_vector *)malloc(sizeof(alg_vector) + new_caps * sizeof(alg_val_type));
-        if (new_vec == NULL)
-            return ALG_ERROR; // Memory allocation failed
-
-        // Copy the old data to the new vector
-        memcpy(new_vec->vector, (*vec)->vector, (*vec)->size * sizeof(alg_val_type));
-        new_vec->size = (*vec)->size;
-        new_vec->caps = new_caps;
-
-        // Free the old vector's memory and update the original vector pointer
-        free((*vec)->vector); // Free the old vector's array memory
-        free(*vec);           // Free the old vector structure
-
-        *vec = new_vec; // Update the original pointer to the new vector
-    }
-
+    (*vec)->size++;
+    alg_state state = alg_vector_ensure_caps_inplace(vec);
+    if (state == ALG_ERROR)
+        return state;
     // Move elements to the right to make space for the new value
     memmove(&(*vec)->vector[pos + 1], &(*vec)->vector[pos], ((*vec)->size - pos) * sizeof(alg_val_type));
     // Insert the new value
     (*vec)->vector[pos] = val;
-    (*vec)->size++;
     return ALG_OK;
 }
 
@@ -204,19 +187,29 @@ alg_vector *alg_vector_create_like(const alg_vector *vector) {
 }
 
 alg_state alg_vector_ensure_caps_inplace(alg_vector **ptr_vector) {
-    if ((*ptr_vector)->caps < (*ptr_vector)->size) {
+    if ((*ptr_vector)->caps == 0) {
+        // 初始化容量为默认大小（例如 16）
+        (*ptr_vector)->caps = ALG_VECTOR_BASE_SIZE;
+    }
+
+    if ((*ptr_vector)->caps <= (*ptr_vector)->size) {
         // 计算新的容量，按 ALG_VECTOR_BASE_SIZE 的倍数进行扩展
-        int new_caps = (((*ptr_vector)->size / ALG_VECTOR_BASE_SIZE) + 1) * ALG_VECTOR_BASE_SIZE;
+        int new_caps = (*ptr_vector)->caps;
+        do {
+            new_caps <<= 1;
+            // 避免溢出
+            if (new_caps <= (*ptr_vector)->caps) {
+                return ALG_ERROR; // 内存溢出，返回错误
+            }
+        } while (new_caps < (*ptr_vector)->size);
 
         // 重新分配内存，扩展容量
-        alg_vector *new_vec = realloc(*ptr_vector, sizeof(alg_vector) + new_caps * sizeof(alg_val_type));
-        if (new_vec == NULL) {
+        alg_vector *temp = ALG_REALLOC(*ptr_vector, sizeof(alg_vector) + new_caps * sizeof(alg_val_type));
+        if (temp == NULL) {
             // 内存分配失败，返回错误
             return ALG_ERROR;
         }
-
-        // 更新原始指针
-        *ptr_vector = new_vec;
+        *ptr_vector = temp; // 确保指针指向新分配的内存
         (*ptr_vector)->caps = new_caps;
     }
     return ALG_OK;
@@ -226,19 +219,12 @@ alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vect
     if (ptr_dest_vector == NULL || *ptr_dest_vector == NULL || src_vector == NULL)
         return ALG_ERROR; // 返回错误代码而不是 NULL
 
-    // 创建目标向量的临时副本
-    alg_vector *tmp_copy = alg_vector_create_like(*ptr_dest_vector);
-    if (tmp_copy == NULL) {
-        return ALG_ERROR; // 内存分配失败
-    }
-
     // 增加目标向量的大小
     (*ptr_dest_vector)->size += src_vector->size;
 
     // 确保目标向量容量足够
     alg_state ret = alg_vector_ensure_caps_inplace(ptr_dest_vector);
     if (ret == ALG_ERROR) {
-        alg_vector_free(tmp_copy); // 释放临时副本
         return ret;
     }
 
@@ -247,18 +233,15 @@ alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vect
             alg_vector_set_val(*ptr_dest_vector, (*ptr_dest_vector)->size - src_vector->size + i, *(alg_vector_get_val(src_vector, i)));
         }
     } else { // 左拼接
-        for (int i = 0; i < (*ptr_dest_vector)->size; i++) {
-            int label = i < src_vector->size;
-            if (label) {
-                alg_vector_set_val(*ptr_dest_vector, i, *(alg_vector_get_val(src_vector, i)));
-            } else {
-                alg_vector_set_val(*ptr_dest_vector, i, *(alg_vector_get_val(tmp_copy, i - src_vector->size)));
-            }
+        // 向右移动目标向量的元素
+        for (int i = (*ptr_dest_vector)->size - 1; i >= src_vector->size; i--) {
+            alg_vector_set_val(*ptr_dest_vector, i, *(alg_vector_get_val(*ptr_dest_vector, i - src_vector->size)));
+        }
+        // 插入源向量的元素
+        for (int i = 0; i < src_vector->size; i++) {
+            alg_vector_set_val(*ptr_dest_vector, i, *(alg_vector_get_val(src_vector, i)));
         }
     }
-
-    // 释放临时副本
-    alg_vector_free(tmp_copy);
 
     return ALG_OK;
 }

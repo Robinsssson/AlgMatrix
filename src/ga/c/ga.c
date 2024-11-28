@@ -1,5 +1,4 @@
 #include "ga.h"
-#include <float.h> // For INFINITY
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,7 +31,7 @@ ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga
     alg_vector *fitness = alg_vector_create(ga->pop_size, 0.0);
     if (fitness == NULL) {
         ALG_FREE(ga);
-        ALG_FREE(population);
+        alg_matrix_free(population);
         return NULL;
     }
     ga->fitness = fitness; // 适应度向量
@@ -40,9 +39,9 @@ ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga
     return ga;
 }
 int ga_select(ga_handle *ga) {
-    int index;
+    int index = 0;  // 初始化 index
     double tmp = ga->fitness->vector[0];
-    for (int i = 0; i < ga->pop_size; ga++) {
+    for (int i = 1; i < ga->pop_size; i++) {  // 修改为 i++，而非 ga++
         if (ga->fitness->vector[i] < tmp) {
             tmp = ga->fitness->vector[i];
             index = i;
@@ -54,8 +53,16 @@ int ga_select(ga_handle *ga) {
 static void calculate_fitness(ga_handle *ga) {
     for (int i = 0; i < ga->pop_size; i++) {
         alg_vector *vec = alg_vector_from_matrix_row(ga->population, i);
+#ifdef USE_ASSERT
+        assert(vec != NULL);
+#else
+        if (vec == NULL) {
+            LOGGING("there is a null vector");
+            return;
+        }
+#endif
         alg_vector_set_val(ga->fitness, i, ga->function(vec)); // 计算每个个体的适应度
-        alg_vector_free(vec);                                         // 释放临时的向量
+        alg_vector_free(vec);                                  // 释放临时的向量
     }
 }
 
@@ -75,9 +82,10 @@ static alg_state sort_base_on_fitness(ga_handle *ga) {
             alg_matrix_set_val(ga->population, i, j, *alg_matrix_get_pos_val(copy_population, array[i], j));
         }
     }
-    alg_vector_free(ga->fitness);
+    for (int i = 0; i < tmp_out->size; i ++)
+        alg_vector_set_val(ga->fitness, i, tmp_out->vector[i]);
+    alg_vector_free(tmp_out);
     alg_matrix_free(copy_population);
-    ga->fitness = tmp_out;
     return ALG_OK;
 }
 

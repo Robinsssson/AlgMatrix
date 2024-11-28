@@ -19,8 +19,7 @@
 void assert_equal(int expected, int actual, const char *test_name) {
     if (expected != actual) {
         // 失败时的输出，红色并加粗
-        printf(COLOR_FAIL "[FAIL] Test %s failed: Expected %d, got %d\n" COLOR_RESET, test_name,
-               expected, actual);
+        printf(COLOR_FAIL "[FAIL] Test %s failed: Expected %d, got %d\n" COLOR_RESET, test_name, expected, actual);
     } else {
         // 成功时的输出，绿色并加粗
         printf(COLOR_PASS "[PASS] Test %s passed\n" COLOR_RESET, test_name);
@@ -35,7 +34,7 @@ void run_tests(TestCase *test_cases, size_t num_tests) {
 
     for (size_t i = 0; i < num_tests; i++) {
         printf("\n--------------------------------------------------\n");
-        printf("Running test: %s\n", test_cases[i].test_name);
+        printf(COLOR_PASS "Running test %zu: %s\n" COLOR_RESET, i, test_cases[i].test_name);
 
         clock_t test_start = clock();         // 记录当前测试的开始时间
         int result = test_cases[i].test_fn(); // 运行测试函数
@@ -46,11 +45,9 @@ void run_tests(TestCase *test_cases, size_t num_tests) {
         // 打印测试结果
         if (result == TEST_FAILED) {
             failed++;
-            printf(COLOR_FAIL "[FAIL] Test %s failed. Duration: %.6f seconds\n" COLOR_RESET,
-                   test_cases[i].test_name, test_duration);
+            printf(COLOR_FAIL "[FAIL] Test %s failed. Duration: %.6f seconds\n" COLOR_RESET, test_cases[i].test_name, test_duration);
         } else {
-            printf(COLOR_PASS "[PASS] Test %s passed. Duration: %.6f seconds\n" COLOR_RESET,
-                   test_cases[i].test_name, test_duration);
+            printf(COLOR_PASS "[PASS] Test %s passed. Duration: %.6f seconds\n" COLOR_RESET, test_cases[i].test_name, test_duration);
         }
         printf("--------------------------------------------------\n");
     }
