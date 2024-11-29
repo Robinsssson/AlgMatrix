@@ -8,6 +8,12 @@
         printf(fmt, ##__VA_ARGS__);                                                                                                                  \
     } while (0)
 
+#define GA_LOGGING_MAT(mat)                                                                                                                          \
+    do {                                                                                                                                             \
+        char *strs = alg_matrix_print_str(mat);                                                                                                      \
+        printf("%s\n", strs);                                                                                                                        \
+        ALG_FREE(strs);                                                                                                                              \
+    } while (0)
 // 初始化遗传算法结构体
 ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga_aim_function function, int args_number, double var_max,
                    double var_min) {
@@ -62,7 +68,7 @@ static void calculate_fitness(ga_handle *ga) {
         assert(vec != NULL);
 #else
         if (vec == NULL) {
-            LOGGING("there is a null vector");
+            ERROR("there is a null vector");
             return;
         }
 #endif
@@ -73,12 +79,16 @@ static void calculate_fitness(ga_handle *ga) {
 
 static alg_state sort_base_on_fitness(ga_handle *ga) {
     alg_vector *tmp_out = alg_vector_create_like(ga->fitness);
-    if (tmp_out == NULL)
+    if (tmp_out == NULL) {
+        ERROR("THE VAL 'tmp_out' INIT ERROR");
         return ALG_ERROR;
+    }
     int array[ga->pop_size];
+    // base on fitness to copy in tmp_out and get index of array
     alg_vector_sort_copy(ga->fitness, tmp_out, array, alg_utils_greater);
     alg_matrix *copy_population = alg_matrix_copy(ga->population);
     if (copy_population == NULL) {
+        ERROR("COPY POPULATION IS FAIL");
         alg_vector_free(tmp_out);
         return ALG_ERROR;
     }
@@ -97,21 +107,32 @@ static alg_state sort_base_on_fitness(ga_handle *ga) {
 
 // 交叉操作：生成两个子代
 static alg_state crossover(ga_handle *ga, const alg_vector *parent1, const alg_vector *parent2, alg_vector **child1, alg_vector **child2) {
-    int cross_number = alg_random_int(0, ga->args_number + 1); // 随机选择交叉点
-
+    int cross_number = alg_random_int(1, ga->args_number); // 随机选择交叉点
+    alg_state state;
     // 将父代划分为两部分
     alg_vector *tmp_parent1_end = alg_vector_slice(parent1, cross_number, ALG_ALL_RANGE);
     alg_vector *tmp_parent2_end = alg_vector_slice(parent2, cross_number, ALG_ALL_RANGE);
     alg_vector *tmp_parent1_begin = alg_vector_slice(parent1, ALG_ALL_RANGE, cross_number);
     alg_vector *tmp_parent2_begin = alg_vector_slice(parent2, ALG_ALL_RANGE, cross_number);
-
-    if (tmp_parent1_end == NULL || tmp_parent2_end == NULL || tmp_parent1_begin == NULL || tmp_parent2_begin == NULL)
+    if (tmp_parent1_begin == NULL || tmp_parent2_begin == NULL) {
+        ERROR("ERROR");
+    }
+    if (tmp_parent1_end == NULL || tmp_parent2_end == NULL || tmp_parent1_begin == NULL || tmp_parent2_begin == NULL) {
+        ERROR("CREARE VECTOR SLICE IS ERROR");
         return ALG_ERROR;
+    }
 
     // 交换部分基因，生成子代
-    alg_vector_concat_inplace(&tmp_parent1_begin, tmp_parent2_end, ALG_VECTOR_CONCAT_R);
-    alg_vector_concat_inplace(&tmp_parent2_begin, tmp_parent1_end, ALG_VECTOR_CONCAT_R);
-
+    state = alg_vector_concat_inplace(&tmp_parent1_begin, tmp_parent2_end, ALG_VECTOR_CONCAT_R);
+    if (state == ALG_ERROR) {
+        ERROR("CHILD CREATE ERROR");
+        return ALG_ERROR;
+    }
+    state = alg_vector_concat_inplace(&tmp_parent2_begin, tmp_parent1_end, ALG_VECTOR_CONCAT_R);
+    if (state == ALG_ERROR) {
+        ERROR("CHILD CREATE ERROR");
+        return ALG_ERROR;
+    }
     *child1 = tmp_parent1_begin;
     *child2 = tmp_parent2_begin;
 
@@ -140,8 +161,10 @@ static alg_state generate_new_population(ga_handle *ga) {
     int number_parents = (int)(round(ga->crossover_rate * ga->pop_size) / 2) * 2;
     // 新种群的矩阵，大小是父代数量的两倍（每对父代生成两个子代）
     alg_matrix *new_population = alg_matrix_create(number_parents * 2, ga->args_number);
-    if (new_population == NULL)
+    if (new_population == NULL) {
+        ERROR("NEW POPULATION CREATE ERROR");
         return ALG_ERROR;
+    }
 
     // 用于存放子代的数组
     alg_vector *child_list[2 * number_parents];
@@ -151,7 +174,9 @@ static alg_state generate_new_population(ga_handle *ga) {
         // 从种群中选择两个父代
         alg_vector *parent1 = alg_vector_from_matrix_row(ga->population, i);
         alg_vector *parent2 = alg_vector_from_matrix_row(ga->population, i + 1);
-
+        if (parent1 == NULL || parent2 == NULL) {
+            exit(-1);
+        }
         // 进行交叉生成两个子代
         alg_vector *child1 = NULL, *child2 = NULL;
         if (crossover(ga, parent1, parent2, &child1, &child2) != ALG_OK) {
@@ -200,11 +225,6 @@ static alg_state generate_new_population(ga_handle *ga) {
 void ga_fresh(ga_handle *ga) {
     calculate_fitness(ga);       // 计算适应度
     generate_new_population(ga); // 生成新一代种群
-    char *str_vector = alg_vector_print_str(ga->fitness);
-    char *str_matrix = alg_matrix_print_str(ga->population);
-    GA_LOGGING("%s %s\n", str_vector, str_matrix);
-    ALG_FREE(str_vector);
-    ALG_FREE(str_matrix);
 }
 
 // 释放遗传算法的内存

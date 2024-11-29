@@ -58,6 +58,7 @@ typedef struct __alg_matrix alg_matrix;
     } while (0)
 // 使用可变参数的日志宏
 #define LOGGING(fmt, ...) MIRCO_PRINT("LOGGING", fmt, ##__VA_ARGS__)
+#define ERROR(fmt, ...) MIRCO_PRINT("ERROR", fmt, ##__VA_ARGS__)
 #define TESTLOG(fmt, ...)                                                                                                                            \
     do {                                                                                                                                             \
         printf("\033[33m[TEST] " fmt "\033[0m\n", ##__VA_ARGS__);                                                                                                   \

@@ -78,6 +78,8 @@ alg_state alg_vector_free(alg_vector *vec) {
 }
 
 alg_vector *alg_vector_from_matrix_row(alg_matrix *matrix, int row) {
+    if (row >= matrix->row)
+        return NULL;
     alg_vector *vec = alg_vector_create(matrix->col, ALG_INIT_VAL);
     if (vec == NULL)
         return NULL;
@@ -87,6 +89,8 @@ alg_vector *alg_vector_from_matrix_row(alg_matrix *matrix, int row) {
 }
 
 alg_vector *alg_vector_from_matrix_col(alg_matrix *matrix, int col) {
+    if (col >= matrix->col)
+        return NULL;
     alg_vector *vec = alg_vector_create(matrix->row, ALG_INIT_VAL);
     if (vec == NULL)
         return NULL;
@@ -159,16 +163,20 @@ alg_vector *alg_vector_slice(const alg_vector *vector, int range_l, int range_r)
         range_r = vector->size + range_r;
 
     // 检查索引有效性
-    if (range_l < 0 || range_r < 0 || range_l >= vector->size || range_r > vector->size || range_l >= range_r)
+    if (range_l < 0 || range_r < 0 || range_l >= vector->size || range_r > vector->size || range_l >= range_r) {
+        ERROR("SLICE VECTOR RANGE ERROR");
         return NULL;
+    }
 
     // 计算切片的长度
     int len = range_r - range_l;
 
     // 创建返回的新向量
     alg_vector *ret_vec = alg_vector_create(len, 0);
-    if (ret_vec == NULL)
+    if (ret_vec == NULL) {
+        ERROR("SLICE VECTOR CREATE INIT ERROR");
         return NULL;
+    }
 
     // 复制源向量的切片到新向量
     memcpy(ret_vec->vector, vector->vector + range_l, len * sizeof(alg_val_type));

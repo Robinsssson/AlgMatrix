@@ -1,6 +1,6 @@
 add_rules("mode.debug", "mode.release")
 
-includes("AlgMath")
+includes("algmath")
 
 if is_plat("windows") then
     set_toolchains("gcc")
