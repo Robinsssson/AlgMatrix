@@ -3,6 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define GA_LOGGING(fmt, ...)                                                                                                                         \
+    do {                                                                                                                                             \
+        printf(fmt, ##__VA_ARGS__);                                                                                                                  \
+    } while (0)
+
 // 初始化遗传算法结构体
 ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga_aim_function function, int args_number, double var_max,
                    double var_min) {
@@ -39,9 +44,9 @@ ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga
     return ga;
 }
 int ga_select(ga_handle *ga) {
-    int index = 0;  // 初始化 index
+    int index = 0; // 初始化 index
     double tmp = ga->fitness->vector[0];
-    for (int i = 1; i < ga->pop_size; i++) {  // 修改为 i++，而非 ga++
+    for (int i = 1; i < ga->pop_size; i++) { // 修改为 i++，而非 ga++
         if (ga->fitness->vector[i] < tmp) {
             tmp = ga->fitness->vector[i];
             index = i;
@@ -82,10 +87,11 @@ static alg_state sort_base_on_fitness(ga_handle *ga) {
             alg_matrix_set_val(ga->population, i, j, *alg_matrix_get_pos_val(copy_population, array[i], j));
         }
     }
-    for (int i = 0; i < tmp_out->size; i ++)
+    for (int i = 0; i < tmp_out->size; i++)
         alg_vector_set_val(ga->fitness, i, tmp_out->vector[i]);
     alg_vector_free(tmp_out);
     alg_matrix_free(copy_population);
+    calculate_fitness(ga);
     return ALG_OK;
 }
 
@@ -132,7 +138,6 @@ static alg_state generate_new_population(ga_handle *ga) {
 
     // 选择父代的数量，这里我们选择偶数个父代
     int number_parents = (int)(round(ga->crossover_rate * ga->pop_size) / 2) * 2;
-
     // 新种群的矩阵，大小是父代数量的两倍（每对父代生成两个子代）
     alg_matrix *new_population = alg_matrix_create(number_parents * 2, ga->args_number);
     if (new_population == NULL)
@@ -169,23 +174,18 @@ static alg_state generate_new_population(ga_handle *ga) {
     }
 
     // 将交叉和变异后的子代填充到新种群
-    for (int i = 0; i < number_parents; i++) {
+    for (int i = 0; i < number_parents; i += 2) {
         for (int j = 0; j < ga->args_number; j++) {
-            // 将子代的基因复制到新种群中
-            alg_matrix_set_val(new_population, i, j, *alg_vector_get_val(child_list[i], j));
-            alg_matrix_set_val(new_population, i + number_parents, j, *alg_vector_get_val(child_list[i + 1], j));
+            alg_matrix_set_val(new_population, i, j, child_list[i]->vector[j]);
+            alg_matrix_set_val(new_population, i + 1, j, child_list[i + 1]->vector[j]);
         }
-
-        // 释放子代向量
-        alg_vector_free(child_list[i]);
-        alg_vector_free(child_list[i + 1]);
     }
 
     // 选择精英策略：将适应度最好的父代保存到新种群中
-    for (int i = 0; i < number_parents; i++) {
+    for (int i = number_parents; i < 2 * number_parents; i++) {
         for (int j = 0; j < ga->args_number; j++) {
             // 保留精英父代（最好适应度的个体）
-            alg_matrix_set_val(new_population, i + number_parents * 2, j, *alg_matrix_get_pos_val(ga->population, i, j));
+            alg_matrix_set_val(new_population, i, j, *alg_matrix_get_pos_val(ga->population, i - number_parents, j));
         }
     }
 
@@ -200,6 +200,11 @@ static alg_state generate_new_population(ga_handle *ga) {
 void ga_fresh(ga_handle *ga) {
     calculate_fitness(ga);       // 计算适应度
     generate_new_population(ga); // 生成新一代种群
+    char *str_vector = alg_vector_print_str(ga->fitness);
+    char *str_matrix = alg_matrix_print_str(ga->population);
+    GA_LOGGING("%s %s\n", str_vector, str_matrix);
+    ALG_FREE(str_vector);
+    ALG_FREE(str_matrix);
 }
 
 // 释放遗传算法的内存

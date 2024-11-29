@@ -1,0 +1,3 @@
+[submodule "AlgMath"]
+	path = AlgMath
+	url = git@github.com:Robinsssson/AlgMath.git

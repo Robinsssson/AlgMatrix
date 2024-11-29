@@ -1,9 +1,9 @@
 add_rules("mode.debug", "mode.release")
 
-includes("algmath")
+includes("AlgMath")
 
 if is_plat("windows") then
-    set_toolchains("mingw")
+    set_toolchains("gcc")
 else 
     set_toolchains("gcc")
 end 

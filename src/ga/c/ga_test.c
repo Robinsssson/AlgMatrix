@@ -5,7 +5,7 @@
 #include <time.h>
 
 // test Value
-const int g_arg = 5;
+const int g_arg = 6;
 
 // 示例适应度函数：目标是最大化 x^2 + y^2
 double fitness_function(alg_vector *individual) {
@@ -19,7 +19,7 @@ double fitness_function(alg_vector *individual) {
 // 主函数：初始化GA并运行
 int main() {
     // 遗传算法参数
-    int pop_size = 100;          // 种群大小
+    int pop_size = 34;          // 种群大小
     double mutation_rate = 0.4;  // 变异率
     double crossover_rate = 0.5; // 交叉率
     int args_number = g_arg;     // 每个个体的基因数（假设我们有x和y两个基因）
@@ -34,7 +34,7 @@ int main() {
     }
     LOGGING("GA ALG INIT OK");
     // 运行遗传算法，进行若干代进化
-    int generations = 2000; // 迭代次数
+    int generations = 10; // 迭代次数
     for (int gen = 0; gen < generations; gen++) {
         ga_fresh(ga); // 进行一代进化
 

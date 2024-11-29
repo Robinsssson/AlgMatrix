@@ -3,7 +3,7 @@ target("algmath")
     add_files("**.c|test/*.c")
     add_defines("ALG_EXPORT")
     if is_plat("windows") then
-        set_toolchains("mingw")
+        set_toolchains("gcc")
     else 
         set_toolchains("gcc")
     end 
@@ -15,7 +15,7 @@ target("test-algmath-vector")
     add_deps("algmath")
     add_includedirs(".")
     if is_plat("windows") then
-        set_toolchains("mingw")
+        set_toolchains("gcc")
     else 
         set_toolchains("gcc")
     end 
@@ -26,7 +26,7 @@ target("test-algmath-matrix")
     add_deps("algmath")
     add_includedirs(".")
     if is_plat("windows") then
-        set_toolchains("mingw")
+        set_toolchains("gcc")
     else 
         set_toolchains("gcc")
     end 
