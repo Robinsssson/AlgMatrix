@@ -7,11 +7,6 @@
 // 定义多元 Rosenbrock 函数
 static double rosenbrock(alg_vector *vec) {
     double sum = 0.0;
-    // for (int i = 0; i < vec->size - 1; i++) {
-    //     double x1 = *alg_vector_get_val(vec, i);
-    //     double x2 = *alg_vector_get_val(vec, i + 1);
-    //     sum += 100.0 * pow(x2 - x1 * x1, 2) + pow(1 - x1, 2);
-    // }
     double x1 = *alg_vector_get_val(vec, 0);
     double x2 = *alg_vector_get_val(vec, 1);
     sum = x1 * x1 + x2 * x2;
