@@ -17,7 +17,8 @@ typedef struct {
 
 typedef double (*evaluate_function)(alg_vector *food);
 
-abc_handle *abc_init(int food_number, int dimension, double lower_bound, double upper_bound, int limit, evaluate_function evaluate);
+abc_handle *abc_init(int food_number, int dimension, double lower_bound, double upper_bound, int limit,
+                     evaluate_function evaluate);
 alg_state abc_fresh(abc_handle *handle);
 alg_state abc_free(abc_handle *handle);
 int abc_get_best_solution(abc_handle *handle);

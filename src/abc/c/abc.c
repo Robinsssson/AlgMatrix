@@ -10,7 +10,8 @@
 
 static void abc_fresh_fitness(abc_handle *handle);
 
-abc_handle *abc_init(int food_number, int dimension, double lower_bound, double upper_bound, int limit, evaluate_function evaluate) {
+abc_handle *abc_init(int food_number, int dimension, double lower_bound, double upper_bound, int limit,
+                     evaluate_function evaluate) {
     abc_handle *handle = ALG_MALLOC(sizeof(abc_handle));
     if (handle == NULL) {
         ERROR("HANDLE INIT ERROR");
@@ -56,7 +57,8 @@ static void search_new_food(abc_handle *handle, alg_vector *current_food) {
     }
     for (int i = 0; i < handle->dim; i++) {
         double current_val = *alg_vector_get_val(current_food, i);
-        alg_vector_set_val(step, i, alg_random_float64(handle->lower_bound - current_val, current_val - handle->lower_bound));
+        alg_vector_set_val(step, i,
+                           alg_random_float64(handle->lower_bound - current_val, current_val - handle->lower_bound));
         alg_vector_set_val(current_food, i, *alg_vector_get_val(step, i));
     }
     alg_vector_free(step);
@@ -69,7 +71,7 @@ static double vector_sum(alg_vector *vec) {
     return ret;
 }
 
-double alg_safe_divide(double numerator, double denominator) {
+static double alg_safe_divide(double numerator, double denominator) {
     if (fabs(denominator) < 1e-9) {
         // 除数为零，返回 NaN (Not a Number)
         ERROR("Division by zero!");
@@ -122,7 +124,7 @@ alg_state abc_fresh(abc_handle *handle) {
     sum = vector_sum(handle->fitness); // 计算适应度的总和
     for (int i = 0; i < handle->food_number; i++) {
         prob = alg_safe_divide(handle->fitness->vector[i], sum); // 计算选择该食物源的概率
-        if (isnan(prob)) {
+        if (__isnan(prob)) {
             ERROR("GET A NAN VAL");
             continue;
         }

@@ -53,22 +53,45 @@ typedef struct __alg_matrix alg_matrix;
 
 #if USE_LOG
 #include <stdio.h>
-#define MIRCO_PRINT(logtag, fmt, ...)                                                                                                                \
+
+#if __STDC_VERSION__ >= 199901L
+#define FUNC_NAME __func__
+#else
+#define FUNC_NAME "unknown_function"
+#endif
+
+#define MIRCO_PRINT_ARGS(logtag, fmt, ...)                                                                                                           \
     do {                                                                                                                                             \
-        printf("[" logtag "] " fmt ", in file %s, function %s, line %d\n", ##__VA_ARGS__, __FILE__, __FUNCTION__, __LINE__);                         \
+        printf("[" logtag "] " fmt ", ", ##__VA_ARGS__);                                                                                             \
+        printf("in file %s, function %s, line %d\n", __FILE__, FUNC_NAME, __LINE__);                                                                 \
     } while (0)
-// 使用可变参数的日志宏
-#define LOGGING(fmt, ...) MIRCO_PRINT("LOGGING", fmt, ##__VA_ARGS__)
-#define ERROR(fmt, ...) MIRCO_PRINT("ERROR", fmt, ##__VA_ARGS__)
-#define TESTLOG(fmt, ...)                                                                                                                            \
+#define MIRCO_PRINT(logtag, fmt)                                                                                                                     \
     do {                                                                                                                                             \
-        printf("\033[33m[TEST] " fmt "\033[0m\n", ##__VA_ARGS__);                                                                                                   \
+        printf("[" logtag "] " fmt ", ");                                                                                                            \
+        printf("in file %s, function %s, line %d\n", __FILE__, FUNC_NAME, __LINE__);                                                                 \
     } while (0)
+
+#define LOGGING(fmt) MIRCO_PRINT("LOGGING", fmt)
+#define LOGGING_ARGS(fmt, ...) MIRCO_PRINT_ARGS("LOGGING", fmt, ##__VA_ARGS__)
+
+#define ERROR(fmt) MIRCO_PRINT("ERROR", fmt)
+#define ERROR_ARGS(fmt, ...) MIRCO_PRINT_ARGS("ERROR", fmt, ##__VA_ARGS__)
+
+#define TESTLOG(fmt)                                                                                                                                 \
+    do {                                                                                                                                             \
+        printf("\033[33m[TEST] " fmt "\033[0m\n");                                                                                                   \
+    } while (0)
+#define TESTLOG_ARGS(fmt, ...)                                                                                                                       \
+    do {                                                                                                                                             \
+        printf("\033[33m[TEST] " fmt "\033[0m\n", __VA_ARGS__);                                                                                      \
+    } while (0)
+
 #else
 #define MIRCO_PRINT(logtag, fmt, ...)
 #define LOGGING(fmt, ...) // 如果没有启用日志记录，空定义
-#define TESTLOG(fmt, ...)
+#define TESTLOG_ARGS(fmt, ...)
 #define ERROR(fmt, ...)
+#define TESTLOG_SINGLE(fmt)
 #endif
 
 typedef struct {

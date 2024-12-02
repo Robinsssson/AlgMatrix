@@ -1,7 +1,6 @@
 #include "aco.h"
 #include "algmath.h"
 #include <math.h>
-#include <vcruntime.h>
 // Solve TSP Question
 
 aco_handle *aco_init(int number, alg_matrix *city_coords, double alpha, double beta, double rho) {
@@ -30,10 +29,6 @@ aco_handle *aco_init(int number, alg_matrix *city_coords, double alpha, double b
     aco->pheromone = alg_matrix_create(number, number);
 }
 
-
-int aco_fresh(aco_handle* aco) {
-    
-}
-
+int aco_fresh(aco_handle *aco) {}
 
 int aco_free(aco_handle *handle);

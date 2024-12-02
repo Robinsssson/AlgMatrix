@@ -6,7 +6,7 @@ IndentWidth:     4  # 使用 4 个空格进行缩进
 TabWidth:        4  # Tab 视为 4 个空格
 UseTab:          Never  # 不使用 Tab，使用空格
 BreakBeforeBraces: Attach  # 大括号和函数或条件语句同一行
-ColumnLimit:     150  # 每行代码的最大长度
+ColumnLimit:     120  # 每行代码的最大长度
 AllowShortFunctionsOnASingleLine: Empty  # 允许空的短函数在一行上
 PointerAlignment: Right  # 指针星号与类型对齐
 SpaceBeforeParens: ControlStatements  # 在控制语句的括号前加空格 (if, for, while)

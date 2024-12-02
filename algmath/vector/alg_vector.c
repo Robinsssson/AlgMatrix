@@ -2,14 +2,19 @@
 #include "../matrix/alg_matrix.h"
 #include "../memalloc/alg_memalloc.h"
 #include "../utils/alg_utils.h"
+#include <corecrt.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 alg_vector *alg_vector_create(int size, alg_val_type init_val) {
+    if (size <= 0) {
+        ERROR("VECTOR CREATE SIZE IS ZERO OR NAGETIVE");
+        return NULL;
+    }
     int t = size / ALG_VECTOR_BASE_SIZE + 1;
-    alg_vector *vec = ALG_MALLOC(sizeof(alg_vector) + sizeof(alg_val_type) * t * ALG_VECTOR_BASE_SIZE);
+    alg_vector *vec = ALG_MALLOC(sizeof(alg_vector) + sizeof(alg_val_type) * (unsigned int)t * ALG_VECTOR_BASE_SIZE);
     if (vec == NULL)
         return NULL;
 
@@ -64,7 +69,13 @@ alg_state alg_vector_insert(alg_vector **vec, int pos, alg_val_type val) {
     if (state == ALG_ERROR)
         return state;
     // Move elements to the right to make space for the new value
-    memmove(&(*vec)->vector[pos + 1], &(*vec)->vector[pos], ((*vec)->size - pos) * sizeof(alg_val_type));
+
+    if ((*vec)->size <= pos) {
+        ERROR("SIZE IS OUT OF POS");
+        return ALG_ERROR;
+    }
+    size_t size_val = (size_t)((*vec)->size - pos);
+    memmove(&(*vec)->vector[pos + 1], &(*vec)->vector[pos], size_val * sizeof(alg_val_type));
     // Insert the new value
     (*vec)->vector[pos] = val;
     return ALG_OK;
@@ -102,16 +113,16 @@ alg_vector *alg_vector_from_matrix_col(alg_matrix *matrix, int col) {
 char *alg_vector_print_str(const alg_vector *vector) {
     if (vector == NULL)
         return NULL;
-    int buf_size = vector->size * 25 + 10;
+    size_t buf_size = (size_t)vector->size * 25 + 10;
     char *str = (char *)ALG_MALLOC(buf_size);
-    int pos = 0;
-    pos += snprintf(str + pos, buf_size - pos, "[");
+    size_t pos = 0;
+    pos += (size_t)snprintf(str + pos, buf_size - pos, "[");
     for (int i = 0; i < vector->size; i++) {
-        pos += snprintf(str + pos, buf_size - pos, "%.2f", vector->vector[i]);
+        pos += (size_t)snprintf(str + pos, buf_size - pos, "%.2f", vector->vector[i]);
         if (i != vector->size - 1)
-            pos += snprintf(str + pos, buf_size - pos, " ");
+            pos += (size_t)snprintf(str + pos, buf_size - pos, " ");
     }
-    pos += snprintf(str + pos, buf_size - pos, "]\n");
+    pos += (size_t)snprintf(str + pos, buf_size - pos, "]\n");
     return str;
 }
 
@@ -119,12 +130,11 @@ alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_vector *dest_ve
                                int (*ptr_compare)(const void *, const void *)) {
     // Ensure the destination vector has enough space to hold the source data
     if (dest_vector->caps < src_vector->size) {
-        // wait to fill
+        ERROR("DEST VECTOR IS NOT CURRENT");
+        return ALG_ERROR;
     }
 
-    // Copy data from source to destination
-    dest_vector->size = src_vector->size;
-    memcpy(dest_vector->vector, src_vector->vector, sizeof(alg_val_type) * src_vector->size);
+    memcpy(dest_vector->vector, src_vector->vector, sizeof(alg_val_type) * (size_t)src_vector->size);
 
     // Sort the destination vector
     qsort(dest_vector->vector, (size_t)dest_vector->size, sizeof(alg_val_type), ptr_compare);
@@ -169,10 +179,10 @@ alg_vector *alg_vector_slice(const alg_vector *vector, int range_l, int range_r)
     }
 
     // 计算切片的长度
-    int len = range_r - range_l;
+    size_t len = (size_t)(range_r - range_l);
 
     // 创建返回的新向量
-    alg_vector *ret_vec = alg_vector_create(len, 0);
+    alg_vector *ret_vec = alg_vector_create((int)len, 0);
     if (ret_vec == NULL) {
         ERROR("SLICE VECTOR CREATE INIT ERROR");
         return NULL;
@@ -187,8 +197,8 @@ alg_vector *alg_vector_slice(const alg_vector *vector, int range_l, int range_r)
 alg_vector *alg_vector_create_like(const alg_vector *vector) {
     if (vector == NULL)
         return NULL;
-    alg_vector *copy_vector = malloc(sizeof(alg_vector) + vector->caps * sizeof(alg_val_type));
-    memcpy(copy_vector->vector, vector->vector, sizeof(alg_val_type) * vector->size);
+    alg_vector *copy_vector = malloc(sizeof(alg_vector) + (size_t)vector->caps * sizeof(alg_val_type));
+    memcpy(copy_vector->vector, vector->vector, sizeof(alg_val_type) * (size_t)vector->size);
     copy_vector->caps = vector->caps;
     copy_vector->size = vector->size;
     return copy_vector;
@@ -212,7 +222,7 @@ alg_state alg_vector_ensure_caps_inplace(alg_vector **ptr_vector) {
         } while (new_caps < (*ptr_vector)->size);
 
         // 重新分配内存，扩展容量
-        alg_vector *temp = ALG_REALLOC(*ptr_vector, sizeof(alg_vector) + new_caps * sizeof(alg_val_type));
+        alg_vector *temp = ALG_REALLOC(*ptr_vector, sizeof(alg_vector) + (size_t)new_caps * sizeof(alg_val_type));
         if (temp == NULL) {
             // 内存分配失败，返回错误
             return ALG_ERROR;
@@ -223,7 +233,8 @@ alg_state alg_vector_ensure_caps_inplace(alg_vector **ptr_vector) {
     return ALG_OK;
 }
 
-alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vector *src_vector, enum alg_vector_concat concat) {
+alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vector *src_vector,
+                                    enum alg_vector_concat concat) {
     if (ptr_dest_vector == NULL || *ptr_dest_vector == NULL || src_vector == NULL)
         return ALG_ERROR; // 返回错误代码而不是 NULL
 
@@ -238,7 +249,8 @@ alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vect
 
     if (concat == ALG_VECTOR_CONCAT_R) { // 右拼接
         for (int i = 0; i < src_vector->size; i++) {
-            alg_vector_set_val(*ptr_dest_vector, (*ptr_dest_vector)->size - src_vector->size + i, *(alg_vector_get_val(src_vector, i)));
+            alg_vector_set_val(*ptr_dest_vector, (*ptr_dest_vector)->size - src_vector->size + i,
+                               *(alg_vector_get_val(src_vector, i)));
         }
     } else { // 左拼接
         // 向右移动目标向量的元素

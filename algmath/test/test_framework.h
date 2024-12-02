@@ -8,7 +8,7 @@
 // Test case structure
 typedef struct {
     const char *test_name;
-    int (*test_fn)(); // Function pointer to test function
+    int (*test_fn)(void); // Function pointer to test function
 } TestCase;
 #define INSERT_TEST(function) {#function, function}
 // Assert function to compare expected and actual values

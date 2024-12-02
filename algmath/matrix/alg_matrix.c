@@ -1,13 +1,19 @@
 #include "alg_matrix.h"
 #include "../alg_inc.h"
 #include "../memalloc/alg_memalloc.h"
+#include <corecrt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 
 alg_matrix *alg_matrix_create(int row, int col) {
-    alg_matrix *mat = (alg_matrix *)ALG_MALLOC(sizeof(alg_matrix) + sizeof(alg_val_type) * row * col);
+    if (row < 0 || col < 0) {
+        ERROR("ERROR IN CREATE MATRIX WITH NAGETIVE ROW OR COL");
+        return NULL;
+    }
+    alg_matrix *mat =
+        (alg_matrix *)ALG_MALLOC(sizeof(alg_matrix) + sizeof(alg_val_type) * (unsigned)row * (unsigned)col);
     if (mat == NULL)
         return NULL;
 
@@ -69,7 +75,7 @@ alg_matrix *alg_matrix_copy(const alg_matrix *matrix) {
     alg_matrix *ret = alg_matrix_create(matrix->row, matrix->col);
     if (ret == NULL)
         return NULL;
-    memcpy(ret->mat, matrix->mat, sizeof(alg_val_type) * matrix->col * matrix->row);
+    memcpy(ret->mat, matrix->mat, sizeof(alg_val_type) * (size_t)(matrix->col * matrix->row));
     return ret;
 }
 
@@ -218,7 +224,7 @@ alg_matrix *alg_matrix_from_vector(const alg_vector *vec) {
     if (matrix == NULL) {
         return NULL;
     }
-    memcpy(matrix->mat, vec->vector, vec->size * sizeof(alg_val_type));
+    memcpy(matrix->mat, vec->vector, (size_t)vec->size * sizeof(alg_val_type));
     return matrix;
 }
 
@@ -228,30 +234,30 @@ char *alg_matrix_print_str(alg_matrix *matrix) {
     }
 
     // 估算初始缓冲区大小。每个数字最多保留 2 位小数，含符号、逗号、空格等。
-    int buf_size = matrix->row * matrix->col * 25 + matrix->row * 4 + 4; // 初始估算
+    size_t buf_size = (size_t)(matrix->row * matrix->col * 25 + matrix->row * 4 + 4); // 初始估算
     char *str = (char *)ALG_MALLOC(buf_size);
     if (str == NULL) {
         return NULL;
     }
 
-    int pos = 0;
-    pos += snprintf(str + pos, buf_size - pos, "[\n"); // 开始矩阵输出
+    size_t pos = 0;
+    pos += (size_t)snprintf(str + pos, buf_size - pos, "[\n"); // 开始矩阵输出
 
     for (int i = 0; i < matrix->row; i++) {
-        pos += snprintf(str + pos, buf_size - pos, " ["); // 每行的起始方括号
+        pos += (size_t)snprintf(str + pos, buf_size - pos, " ["); // 每行的起始方括号
         for (int j = 0; j < matrix->col; j++) {
             // 每个元素以 "%.2f" 格式输出，后跟逗号
-            pos += snprintf(str + pos, buf_size - pos, "%.2f", matrix->mat[i * matrix->col + j]);
+            pos += (size_t)snprintf(str + pos, buf_size - pos, "%.2f", matrix->mat[i * matrix->col + j]);
             if (j < matrix->col - 1) {
-                pos += snprintf(str + pos, buf_size - pos, ", ");
+                pos += (size_t)snprintf(str + pos, buf_size - pos, ", ");
             }
         }
-        pos += snprintf(str + pos, buf_size - pos, "]"); // 行的结束方括号
+        pos += (size_t)snprintf(str + pos, buf_size - pos, "]"); // 行的结束方括号
         if (i < matrix->row - 1) {
-            pos += snprintf(str + pos, buf_size - pos, ",\n"); // 行之间的逗号换行
+            pos += (size_t)snprintf(str + pos, buf_size - pos, ",\n"); // 行之间的逗号换行
         }
     }
-    pos += snprintf(str + pos, buf_size - pos, "\n]\n"); // 矩阵结束方括号
+    pos += (size_t)snprintf(str + pos, buf_size - pos, "\n]\n"); // 矩阵结束方括号
 
     return str;
 }
@@ -304,7 +310,7 @@ alg_state alg_matrix_set_row(alg_matrix *matrix, int row, const alg_vector *vec)
     }
 
     return ALG_OK;
-};
+}
 
 void alg_matrix_fill_random(alg_matrix *matrix, double min_val, double max_val) {
     // 如果矩阵为空，直接返回
@@ -336,8 +342,8 @@ void alg_matrix_clamp(alg_matrix *matrix, double min_val, double max_val) {
     }
 }
 
-#define INTERATOR_MATRIX(matrix, irow, icol)                                                                                                         \
-    for (int irow = 0; irow < (matrix)->row; irow++)                                                                                                   \
+#define INTERATOR_MATRIX(matrix, irow, icol)                                                                           \
+    for (int irow = 0; irow < (matrix)->row; irow++)                                                                   \
         for (int icol = 0; icol < (matrix)->col; icol++)
 
 alg_state alg_matrix_concat(alg_matrix **dest_matrix, alg_matrix *src_matrix, enum alg_matrix_concat concat) {
@@ -356,18 +362,20 @@ alg_state alg_matrix_concat(alg_matrix **dest_matrix, alg_matrix *src_matrix, en
         case CONCAT_AXIS_RX: // 右侧拼接，行数相同，列数增加
             if (!is_row_match)
                 return ALG_ERROR;
-            new_size = sizeof(alg_matrix) + ((*dest_matrix)->row * ((*dest_matrix)->col + src_matrix->col)) * sizeof(alg_val_type);
+            new_size = (size_t)((*dest_matrix)->row * ((*dest_matrix)->col + src_matrix->col)) * sizeof(alg_val_type)
+                       + sizeof(alg_matrix);
             break;
         case CONCAT_AXIS_UY: // 上侧拼接，列数相同，行数增加
         case CONCAT_AXIS_DY: // 下侧拼接，列数相同，行数增加
             if (!is_col_match)
                 return ALG_ERROR;
-            new_size = sizeof(alg_matrix) + (((*dest_matrix)->row + src_matrix->row) * (*dest_matrix)->col) * sizeof(alg_val_type);
+            new_size = (size_t)(((*dest_matrix)->row + src_matrix->row) * (*dest_matrix)->col) * sizeof(alg_val_type)
+                       + sizeof(alg_matrix);
             break;
         default:
             return ALG_ERROR; // 无效的拼接方向
     }
-    alg_matrix* copy_matrix = alg_matrix_copy(*dest_matrix);
+    alg_matrix *copy_matrix = alg_matrix_copy(*dest_matrix);
     // 扩容目标矩阵
     *dest_matrix = ALG_REALLOC(*dest_matrix, new_size);
     // 更新目标矩阵的行数和列数
@@ -378,7 +386,7 @@ alg_state alg_matrix_concat(alg_matrix **dest_matrix, alg_matrix *src_matrix, en
     }
     if (!dest_matrix)
         return ALG_ERROR; // 内存分配失败
-    
+
     // 根据拼接方向执行数据搬移
     switch (concat) {
         case CONCAT_AXIS_LX: // 左侧拼接，行数相同，列数增加

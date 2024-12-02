@@ -13,8 +13,7 @@ static void pso_free_internal(pso_handle *pso_structure) {
     ALG_FREE(pso_structure->p_best_fitness);
 }
 
-pso_handle *pso_init(int number, int dim, double w, double c1, double c2, pso_aim_function function,
-                     pso_type type) {
+pso_handle *pso_init(int number, int dim, double w, double c1, double c2, pso_aim_function function, pso_type type) {
     pso_handle *pso_structure = ALG_MALLOC(sizeof(pso_handle));
     if (!pso_structure)
         return NULL;
@@ -22,16 +21,14 @@ pso_handle *pso_init(int number, int dim, double w, double c1, double c2, pso_ai
     pso_structure->vec = alg_matrix_create(number, dim);
     pso_structure->position = alg_matrix_create(number, dim);
     pso_structure->p_best = alg_matrix_copy(pso_structure->position);
-    pso_structure->g_best =
-        alg_matrix_create(number, dim); // Global best is usually a single particle
+    pso_structure->g_best = alg_matrix_create(number, dim); // Global best is usually a single particle
 
-    if (!pso_structure->vec || !pso_structure->position || !pso_structure->p_best
-        || !pso_structure->g_best) {
+    if (!pso_structure->vec || !pso_structure->position || !pso_structure->p_best || !pso_structure->g_best) {
         pso_free_internal(pso_structure);
         return NULL;
     }
 
-    pso_structure->p_best_fitness = ALG_MALLOC(number * sizeof(double));
+    pso_structure->p_best_fitness = ALG_MALLOC((long long unsigned int)number * sizeof(double));
     if (!pso_structure->p_best_fitness) {
         pso_free_internal(pso_structure);
         return NULL;

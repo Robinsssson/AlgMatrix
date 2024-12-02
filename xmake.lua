@@ -14,6 +14,12 @@ target("pso")
     add_files("src/pso/c/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
+    add_cflags(
+        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
+        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
+        "-Wstrict-prototypes", "-Wmissing-prototypes", 
+        "-Wredundant-decls"
+    )
 
 
 target("ga")
@@ -21,10 +27,23 @@ target("ga")
     add_files("src/ga/c/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
+    add_cflags(
+        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
+        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
+        "-Wstrict-prototypes", "-Wmissing-prototypes", 
+        "-Wredundant-decls"
+    )
+
 
 target("abc")
     set_kind("binary")
     add_files("src/abc/c/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
+    add_cflags(
+        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
+        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
+        "-Wstrict-prototypes", "-Wmissing-prototypes", 
+        "-Wredundant-decls"
+    )
 

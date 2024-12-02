@@ -8,7 +8,7 @@
 const int g_arg = 6;
 
 // 示例适应度函数：目标是最大化 x^2 + y^2
-double fitness_function(alg_vector *individual) {
+static double fitness_function(alg_vector *individual) {
     double ret = 0.0;
     for (int i = 0; i < g_arg; i++) {
         double x = *alg_vector_get_val(individual, i);
@@ -17,7 +17,7 @@ double fitness_function(alg_vector *individual) {
     return ret;
 }
 // 主函数：初始化GA并运行
-int main() {
+int main(void) {
     // 遗传算法参数
     int pop_size = 1000;          // 种群大小
     double mutation_rate = 0.4;  // 变异率
@@ -25,7 +25,7 @@ int main() {
     int args_number = g_arg;     // 每个个体的基因数（假设我们有x和y两个基因）
     double var_max = 100.0;      // 基因的最大值
     double var_min = -100.0;     // 基因的最小值
-    srand(time(0));
+    srand((unsigned int)time(0));
     // 初始化GA
     ga_handle *ga = ga_init(pop_size, mutation_rate, crossover_rate, fitness_function, args_number, var_max, var_min);
     if (ga == NULL) {

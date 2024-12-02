@@ -5,7 +5,7 @@
 #include <time.h>
 
 // 定义多元 Rosenbrock 函数
-double rosenbrock(alg_vector *vec) {
+static double rosenbrock(alg_vector *vec) {
     double sum = 0.0;
     // for (int i = 0; i < vec->size - 1; i++) {
     //     double x1 = *alg_vector_get_val(vec, i);
@@ -19,7 +19,7 @@ double rosenbrock(alg_vector *vec) {
 }
 
 // 测试用例
-int main() {
+int main(void) {
     // 设置 ABC 参数
     int food_number = 500;     // 蜂群数量
     int dimension = 2;         // 搜索空间维度（此处为二维）
@@ -41,7 +41,7 @@ int main() {
     for (int iter = 0; iter < 2000; iter++) { // 迭代1000次
         abc_fresh(handle);
         if (iter % 10 == 0) {
-            printf("[gen %3d] ", iter/10);
+            printf("[gen %3d] ", iter / 10);
             abc_get_best_solution(handle);
         }
     }

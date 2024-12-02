@@ -1,17 +1,18 @@
+#include "alg_inc.h"
 #include "algmath.h"
 #include "test_framework.h"
 #include <math.h>
 #include <stdio.h>
 
 // Test: Create a vector with given size and initial value
-int test_alg_vector_create() {
+static int test_alg_vector_create(void) {
     const int test_number = 500;
     TESTLOG("START TEST INIT CREATE API");
     alg_vector *vec = alg_vector_create(10, 5.0f);
     if (vec == NULL)
         return TEST_FAILED;
     for (int i = 0; i < vec->size; i++) {
-        if (*alg_vector_get_val(vec, i) != 5.0f) {
+        if (fabs(*alg_vector_get_val(vec, i) - 5.0f) > 1e-9) {
             alg_vector_free(vec);
             return TEST_FAILED;
         }
@@ -36,13 +37,13 @@ int test_alg_vector_create() {
 }
 
 // Test: Get value from a vector at a specific position
-int test_alg_vector_get_val() {
+static int test_alg_vector_get_val(void) {
     alg_vector *vec = alg_vector_create(5, 10.0f);
     if (vec == NULL)
         return TEST_FAILED;
 
     for (int i = 0; i < 5; i++) {
-        if (*alg_vector_get_val(vec, i) != 10.0f) {
+        if (fabs(*alg_vector_get_val(vec, i) - 10.0f) > 1e-9) {
             alg_vector_free(vec);
             return TEST_FAILED;
         }
@@ -52,12 +53,12 @@ int test_alg_vector_get_val() {
 }
 
 // Test: Set value at a specific position in the vector
-int test_alg_vector_set_val() {
+static int test_alg_vector_set_val(void) {
     alg_vector *vec = alg_vector_create(5, 1.0f);
     if (vec == NULL)
         return TEST_FAILED;
 
-    if (alg_vector_set_val(vec, 2, 3.0f) != ALG_OK || *alg_vector_get_val(vec, 2) != 3.0f) {
+    if (alg_vector_set_val(vec, 2, 3.0f) != ALG_OK || fabs(*alg_vector_get_val(vec, 2) - 3.0f) > 1e-9) {
         alg_vector_free(vec);
         return TEST_FAILED;
     }
@@ -66,7 +67,7 @@ int test_alg_vector_set_val() {
 }
 
 // Test: Insert value at a specific position in the vector
-int test_alg_vector_insert() {
+static int test_alg_vector_insert(void) {
     alg_vector *vec = alg_vector_create(5, 10.0f);
     if (vec == NULL)
         return TEST_FAILED;
@@ -82,7 +83,7 @@ int test_alg_vector_insert() {
         return TEST_FAILED;
 
     TESTLOG("START LARGE NUMBER ENSURE TEST");
-    if (*alg_vector_get_val(vec, 160003) != 10.0f) {
+    if (fabs(*alg_vector_get_val(vec, 160003) - 10.0f) > 1e-9) {
         alg_vector_free(vec);
         return TEST_FAILED;
     }
@@ -92,7 +93,7 @@ int test_alg_vector_insert() {
 }
 
 // Test: Free the vector
-int test_alg_vector_free() {
+static int test_alg_vector_free(void) {
     alg_vector *vec = alg_vector_create(5, 1.0f);
     if (vec == NULL)
         return TEST_FAILED;
@@ -102,7 +103,7 @@ int test_alg_vector_free() {
 }
 
 // Test: Sort vector (copy) with a custom comparator
-int test_alg_vector_sort_copy() {
+static int test_alg_vector_sort_copy(void) {
     const int test_number = 500;
     alg_vector *vec = alg_vector_create(test_number, 1.0f);
     for (int i = 0; i < test_number; i++) {
@@ -131,7 +132,7 @@ int test_alg_vector_sort_copy() {
 }
 
 // Test: Slice a vector (create a sub-vector)
-int test_alg_vector_slice() {
+static int test_alg_vector_slice(void) {
     const int test_number = 50000;
     alg_vector *vec = alg_vector_create(test_number, 1.0f);
     for (int i = 0; i < test_number; i++) {
@@ -145,7 +146,7 @@ int test_alg_vector_slice() {
     if (sliced_vec->size != test_number / 100) {
         return TEST_FAILED;
     }
-    TESTLOG("EXPECT NUMBER %f, GET %f", (double)test_number / 100 - 5, sliced_vec->vector[test_number / 100 - 5]);
+    TESTLOG_ARGS("EXPECT NUMBER %f, GET %f", (double)test_number / 100 - 5, sliced_vec->vector[test_number / 100 - 5]);
     if (fabs(sliced_vec->vector[test_number / 100 - 5] - (double)test_number / 100 + 5) > 1e-9)
         return TEST_FAILED;
     alg_vector_free(sliced_vec);
@@ -157,7 +158,7 @@ int test_alg_vector_slice() {
     if (sliced_vec->size != test_number / 100) {
         return TEST_FAILED;
     }
-    TESTLOG("EXPECT NUMBER %f, GET %f", (double)test_number - 5, sliced_vec->vector[test_number / 100 - 5]);
+    TESTLOG_ARGS("EXPECT NUMBER %f, GET %f", (double)test_number - 5, sliced_vec->vector[test_number / 100 - 5]);
     if (fabs(sliced_vec->vector[test_number / 100 - 5] - test_number + 5) > 1e-9)
         return TEST_FAILED;
     alg_vector_free(sliced_vec);
@@ -166,7 +167,7 @@ int test_alg_vector_slice() {
     int a = alg_random_int(0, test_number / 2);
     int b = alg_random_int(test_number / 2, test_number);
     sliced_vec = alg_vector_slice(vec, a, b);
-    TESTLOG("EXPECT NUMBER %d, %d, GET %d", a, b, sliced_vec->size);
+    TESTLOG_ARGS("EXPECT NUMBER %d, %d, GET %d", a, b, sliced_vec->size);
     if (sliced_vec->size != (b - a)) {
         return TEST_FAILED;
     }
@@ -175,7 +176,7 @@ int test_alg_vector_slice() {
     return TEST_PASSED;
 }
 // Test: Concatenate two vectors (right and left concat)
-int test_alg_vector_concat_inplace() {
+static int test_alg_vector_concat_inplace(void) {
     // Create two vectors
     const int test_val1 = 30;
     const int test_val2 = 40;
@@ -196,7 +197,7 @@ int test_alg_vector_concat_inplace() {
     // Check the values after right concatenation: {1.0f, 1.0f, 1.0f, 2.0f, 2.0f}
     for (int i = 0; i < test_val1 + test_val2; i++) {
         alg_val_type identify = i < test_val1 ? 1.0f : 2.0f;
-        if (vec1->vector[i] != identify)
+        if (!FLOAT_COMPARE_IS(vec1->vector[i], identify))
             return TEST_FAILED;
     }
     TESTLOG("CONCAT RIGHT OVER");
@@ -213,7 +214,7 @@ int test_alg_vector_concat_inplace() {
     TESTLOG("IDENTIFY CONCAT LEFT START");
     for (int i = 0; i < test_val1 + 2 * test_val2; i++) {
         alg_val_type identify = i < test_val2 || i >= test_val1 + test_val2 ? 2.0f : 1.0f;
-        if (vec1->vector[i] != identify)
+        if (!FLOAT_COMPARE_IS(vec1->vector[i], identify))
             return TEST_FAILED;
     }
     TESTLOG("CONCAT OVER START");
@@ -225,7 +226,7 @@ int test_alg_vector_concat_inplace() {
 }
 
 // Main function to run all tests
-int TEST_MAIN() {
+int TEST_MAIN(void) {
     TEST_SCOPE_NEGIN = {INSERT_TEST(test_alg_vector_create), INSERT_TEST(test_alg_vector_get_val),       INSERT_TEST(test_alg_vector_set_val),
                         INSERT_TEST(test_alg_vector_insert), INSERT_TEST(test_alg_vector_free),          INSERT_TEST(test_alg_vector_sort_copy),
                         INSERT_TEST(test_alg_vector_slice),  INSERT_TEST(test_alg_vector_concat_inplace)};

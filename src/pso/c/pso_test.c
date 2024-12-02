@@ -5,7 +5,7 @@
 #include <time.h>
 
 // 定义PSO算法的目标函数
-double test_function(alg_vector *vec) {
+static double test_function(alg_vector *vec) {
     // 确保向量的大小为2（二维空间）
     if (vec == NULL || vec->size != 2) {
         return -1;
@@ -19,7 +19,7 @@ double test_function(alg_vector *vec) {
 }
 
 // 定义测试函数
-void test_pso() {
+static void test_pso(void) {
     // PSO参数设定
     int particle_number = 500; // 粒子数量
     int dimensions = 2;        // 维度
@@ -37,20 +37,20 @@ void test_pso() {
         pso_fresh(pso, -1, 1);
 
         // 输出每次迭代的最优解和最优适应度值
-        printf("Iteration %d: Best fitness = %.4f, Best position = (%.8f, %.8f)\n", iter,
-               pso->g_best_fitness, pso->g_best->mat[0], pso->g_best->mat[1]);
+        printf("Iteration %d: Best fitness = %.4f, Best position = (%.8f, %.8f)\n", iter, pso->g_best_fitness,
+               pso->g_best->mat[0], pso->g_best->mat[1]);
     }
 
     // 检查最终结果
-    printf("Final best fitness = %.4f, Final best position = (%.8f, %.8f)\n", pso->g_best_fitness,
-           pso->g_best->mat[0], pso->g_best->mat[1]);
+    printf("Final best fitness = %.4f, Final best position = (%.8f, %.8f)\n", pso->g_best_fitness, pso->g_best->mat[0],
+           pso->g_best->mat[1]);
 
     // 释放PSO句柄
     pso_free(pso);
 }
 
-int main() {
-    srand(time(NULL));
+int main(void) {
+    srand((unsigned int)time(NULL));
     test_pso();
     return 0;
 }

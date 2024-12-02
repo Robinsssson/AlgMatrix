@@ -6,7 +6,14 @@ target("algmath")
         set_toolchains("gcc")
     else 
         set_toolchains("gcc")
-    end 
+    end
+    add_cflags(
+        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
+        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
+        "-Wstrict-prototypes", "-Wmissing-prototypes", 
+        "-Wredundant-decls"
+    )
+ 
 
 
 target("test-algmath-vector")
@@ -19,6 +26,12 @@ target("test-algmath-vector")
     else 
         set_toolchains("gcc")
     end 
+    add_cflags(
+        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
+        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
+        "-Wstrict-prototypes", "-Wmissing-prototypes", 
+        "-Wredundant-decls"
+    )
 
 target("test-algmath-matrix")
     set_kind("binary")
@@ -30,4 +43,10 @@ target("test-algmath-matrix")
     else 
         set_toolchains("gcc")
     end 
+    add_cflags(
+        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
+        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
+        "-Wstrict-prototypes", "-Wmissing-prototypes", 
+        "-Wredundant-decls"
+    )
 

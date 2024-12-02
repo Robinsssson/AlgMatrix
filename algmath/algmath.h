@@ -7,6 +7,8 @@
 #include "utils/alg_utils.h"
 #include "vector/alg_vector.h"
 
+#include <math.h>
 
+#define FLOAT_COMPARE_IS(val1, val2) (fabs(val1 - val2) < 1e-9)
 #define API_VERSION "0.0.1"
 #endif
