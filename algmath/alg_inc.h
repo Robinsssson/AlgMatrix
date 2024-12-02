@@ -52,6 +52,7 @@ typedef struct __alg_matrix alg_matrix;
 #define ALG_LOG_MSG_FREE_NULL "Attempted to free a NULL vector."
 
 #if USE_LOG
+#include <stdio.h>
 #define MIRCO_PRINT(logtag, fmt, ...)                                                                                                                \
     do {                                                                                                                                             \
         printf("[" logtag "] " fmt ", in file %s, function %s, line %d\n", ##__VA_ARGS__, __FILE__, __FUNCTION__, __LINE__);                         \
@@ -67,6 +68,7 @@ typedef struct __alg_matrix alg_matrix;
 #define MIRCO_PRINT(logtag, fmt, ...)
 #define LOGGING(fmt, ...) // 如果没有启用日志记录，空定义
 #define TESTLOG(fmt, ...)
+#define ERROR(fmt, ...)
 #endif
 
 typedef struct {
