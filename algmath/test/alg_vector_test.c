@@ -1,5 +1,6 @@
 #include "algmath.h"
 #include "test_framework.h"
+#include <math.h>
 #include <stdio.h>
 
 // Test: Create a vector with given size and initial value
@@ -25,7 +26,7 @@ int test_alg_vector_create() {
         vecs[i] = new_vecs;
     }
     TESTLOG("OVER TEST PRESS OF CREATE");
-    if ((*alg_vector_get_val(vecs[test_number / 100], 700) - 5.0f) > 1e-9)
+    if (fabs(*alg_vector_get_val(vecs[test_number / 100], 700) - 5.0f) > 1e-9)
         return TEST_FAILED;
     TESTLOG("START FREE");
     for (int i = 0; i < test_number; i++) {
@@ -145,7 +146,7 @@ int test_alg_vector_slice() {
         return TEST_FAILED;
     }
     TESTLOG("EXPECT NUMBER %f, GET %f", (double)test_number / 100 - 5, sliced_vec->vector[test_number / 100 - 5]);
-    if ((sliced_vec->vector[test_number / 100 - 5] - (double)test_number / 100 + 5) > 1e-9)
+    if (fabs(sliced_vec->vector[test_number / 100 - 5] - (double)test_number / 100 + 5) > 1e-9)
         return TEST_FAILED;
     alg_vector_free(sliced_vec);
 
@@ -157,7 +158,7 @@ int test_alg_vector_slice() {
         return TEST_FAILED;
     }
     TESTLOG("EXPECT NUMBER %f, GET %f", (double)test_number - 5, sliced_vec->vector[test_number / 100 - 5]);
-    if ((sliced_vec->vector[test_number / 100 - 5] - test_number + 5) > 1e-9)
+    if (fabs(sliced_vec->vector[test_number / 100 - 5] - test_number + 5) > 1e-9)
         return TEST_FAILED;
     alg_vector_free(sliced_vec);
 
