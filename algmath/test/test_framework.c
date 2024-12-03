@@ -1,19 +1,6 @@
 #include "test_framework.h"
 #include <stdio.h>
-#include <time.h> // for clock()
-
-// 颜色控制代码
-#ifdef _WIN32
-#define COLOR_RESET "\033[0m"
-#define COLOR_PASS "\033[32m" // 绿色
-#define COLOR_FAIL "\033[31m" // 红色
-#define COLOR_BOLD "\033[1m"  // 加粗
-#else
-#define COLOR_RESET
-#define COLOR_PASS
-#define COLOR_FAIL
-#define COLOR_BOLD
-#endif
+#include <time.h>
 
 // 测试结果断言
 void assert_equal(int expected, int actual, const char *test_name) {
@@ -45,9 +32,11 @@ void run_tests(TestCase *test_cases, size_t num_tests) {
         // 打印测试结果
         if (result == TEST_FAILED) {
             failed++;
-            printf(COLOR_FAIL "[FAIL] Test %s failed. Duration: %.6f seconds\n" COLOR_RESET, test_cases[i].test_name, test_duration);
+            printf(COLOR_FAIL "[FAIL] Test %s failed. Duration: %.6f seconds\n" COLOR_RESET, test_cases[i].test_name,
+                   test_duration);
         } else {
-            printf(COLOR_PASS "[PASS] Test %s passed. Duration: %.6f seconds\n" COLOR_RESET, test_cases[i].test_name, test_duration);
+            printf(COLOR_PASS "[PASS] Test %s passed. Duration: %.6f seconds\n" COLOR_RESET, test_cases[i].test_name,
+                   test_duration);
         }
         printf("--------------------------------------------------\n");
     }

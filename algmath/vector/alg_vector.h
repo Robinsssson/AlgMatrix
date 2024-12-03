@@ -109,7 +109,8 @@ enum alg_vector_concat {
 };
 ALG_MATH_API alg_state alg_vector_ensure_caps_inplace(alg_vector **ptr_vector);
 
-ALG_MATH_API alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vector *src_vector, enum alg_vector_concat concat);
+ALG_MATH_API alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vector *src_vector,
+                                                 enum alg_vector_concat concat);
 #ifdef __cplusplus
 }
 #endif

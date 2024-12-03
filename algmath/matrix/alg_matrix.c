@@ -1,7 +1,6 @@
 #include "alg_matrix.h"
 #include "../alg_inc.h"
 #include "../memalloc/alg_memalloc.h"
-#include <corecrt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

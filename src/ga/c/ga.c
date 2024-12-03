@@ -3,20 +3,20 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define GA_LOGGING(fmt, ...)                                                                                                                         \
-    do {                                                                                                                                             \
-        printf(fmt, ##__VA_ARGS__);                                                                                                                  \
+#define GA_LOGGING(fmt, ...)                                                                                           \
+    do {                                                                                                               \
+        printf(fmt, ##__VA_ARGS__);                                                                                    \
     } while (0)
 
-#define GA_LOGGING_MAT(mat)                                                                                                                          \
-    do {                                                                                                                                             \
-        char *strs = alg_matrix_print_str(mat);                                                                                                      \
-        printf("%s\n", strs);                                                                                                                        \
-        ALG_FREE(strs);                                                                                                                              \
+#define GA_LOGGING_MAT(mat)                                                                                            \
+    do {                                                                                                               \
+        char *strs = alg_matrix_print_str(mat);                                                                        \
+        printf("%s\n", strs);                                                                                          \
+        ALG_FREE(strs);                                                                                                \
     } while (0)
 // 初始化遗传算法结构体
-ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga_aim_function function, int args_number, double var_max,
-                   double var_min) {
+ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga_aim_function function, int args_number,
+                   double var_max, double var_min) {
     ga_handle *ga = ALG_MALLOC(sizeof(ga_handle));
     if (ga == NULL)
         return NULL;
@@ -106,7 +106,8 @@ static alg_state sort_base_on_fitness(ga_handle *ga) {
 }
 
 // 交叉操作：生成两个子代
-static alg_state crossover(ga_handle *ga, const alg_vector *parent1, const alg_vector *parent2, alg_vector **child1, alg_vector **child2) {
+static alg_state crossover(ga_handle *ga, const alg_vector *parent1, const alg_vector *parent2, alg_vector **child1,
+                           alg_vector **child2) {
     int cross_number = alg_random_int(1, ga->args_number); // 随机选择交叉点
     alg_state state;
     // 将父代划分为两部分

@@ -60,15 +60,15 @@ typedef struct __alg_matrix alg_matrix;
 #define FUNC_NAME "unknown_function"
 #endif
 
-#define MIRCO_PRINT_ARGS(logtag, fmt, ...)                                                                                                           \
-    do {                                                                                                                                             \
-        printf("[" logtag "] " fmt ", ", ##__VA_ARGS__);                                                                                             \
-        printf("in file %s, function %s, line %d\n", __FILE__, FUNC_NAME, __LINE__);                                                                 \
+#define MIRCO_PRINT_ARGS(logtag, fmt, ...)                                                                             \
+    do {                                                                                                               \
+        printf("[" logtag "] " fmt ", ", ##__VA_ARGS__);                                                               \
+        printf("in file %s, function %s, line %d\n", __FILE__, FUNC_NAME, __LINE__);                                   \
     } while (0)
-#define MIRCO_PRINT(logtag, fmt)                                                                                                                     \
-    do {                                                                                                                                             \
-        printf("[" logtag "] " fmt ", ");                                                                                                            \
-        printf("in file %s, function %s, line %d\n", __FILE__, FUNC_NAME, __LINE__);                                                                 \
+#define MIRCO_PRINT(logtag, fmt)                                                                                       \
+    do {                                                                                                               \
+        printf("[" logtag "] " fmt ", ");                                                                              \
+        printf("in file %s, function %s, line %d\n", __FILE__, FUNC_NAME, __LINE__);                                   \
     } while (0)
 
 #define LOGGING(fmt) MIRCO_PRINT("LOGGING", fmt)
@@ -77,13 +77,13 @@ typedef struct __alg_matrix alg_matrix;
 #define ERROR(fmt) MIRCO_PRINT("ERROR", fmt)
 #define ERROR_ARGS(fmt, ...) MIRCO_PRINT_ARGS("ERROR", fmt, ##__VA_ARGS__)
 
-#define TESTLOG(fmt)                                                                                                                                 \
-    do {                                                                                                                                             \
-        printf("\033[33m[TEST] " fmt "\033[0m\n");                                                                                                   \
+#define TESTLOG(fmt)                                                                                                   \
+    do {                                                                                                               \
+        printf("\033[33m[TEST] " fmt "\033[0m\n");                                                                     \
     } while (0)
-#define TESTLOG_ARGS(fmt, ...)                                                                                                                       \
-    do {                                                                                                                                             \
-        printf("\033[33m[TEST] " fmt "\033[0m\n", __VA_ARGS__);                                                                                      \
+#define TESTLOG_ARGS(fmt, ...)                                                                                         \
+    do {                                                                                                               \
+        printf("\033[33m[TEST] " fmt "\033[0m\n", __VA_ARGS__);                                                        \
     } while (0)
 
 #else
@@ -95,10 +95,22 @@ typedef struct __alg_matrix alg_matrix;
 #endif
 
 typedef struct {
+#if defined(__linux__)
+    void *(*alg_memalloc_malloc)(unsigned long);
+    void (*alg_memalloc_free)(void *);
+    void *(*alg_memalloc_realloc)(void *, unsigned long);
+    void *(*alg_memalloc_calloc)(unsigned long, unsigned long);
+#elif defined(_WIN32)
     void *(*alg_memalloc_malloc)(unsigned long long);
     void (*alg_memalloc_free)(void *);
     void *(*alg_memalloc_realloc)(void *, unsigned long long);
     void *(*alg_memalloc_calloc)(unsigned long long, unsigned long long);
+#else
+    void *(*alg_memalloc_malloc)(unsigned long long);
+    void (*alg_memalloc_free)(void *);
+    void *(*alg_memalloc_realloc)(void *, unsigned long long);
+    void *(*alg_memalloc_calloc)(unsigned long long, unsigned long long);
+#endif
 } alg_memalloc_hook;
 
 #ifdef __cplusplus

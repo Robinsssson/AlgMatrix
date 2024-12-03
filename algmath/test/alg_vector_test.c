@@ -227,8 +227,9 @@ static int test_alg_vector_concat_inplace(void) {
 
 // Main function to run all tests
 int TEST_MAIN(void) {
-    TEST_SCOPE_NEGIN = {INSERT_TEST(test_alg_vector_create), INSERT_TEST(test_alg_vector_get_val),       INSERT_TEST(test_alg_vector_set_val),
-                        INSERT_TEST(test_alg_vector_insert), INSERT_TEST(test_alg_vector_free),          INSERT_TEST(test_alg_vector_sort_copy),
-                        INSERT_TEST(test_alg_vector_slice),  INSERT_TEST(test_alg_vector_concat_inplace)};
+    TEST_SCOPE_NEGIN = {INSERT_TEST(test_alg_vector_create),  INSERT_TEST(test_alg_vector_get_val),
+                        INSERT_TEST(test_alg_vector_set_val), INSERT_TEST(test_alg_vector_insert),
+                        INSERT_TEST(test_alg_vector_free),    INSERT_TEST(test_alg_vector_sort_copy),
+                        INSERT_TEST(test_alg_vector_slice),   INSERT_TEST(test_alg_vector_concat_inplace)};
     TEST_SCOPE_END
 }

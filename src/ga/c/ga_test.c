@@ -19,7 +19,7 @@ static double fitness_function(alg_vector *individual) {
 // 主函数：初始化GA并运行
 int main(void) {
     // 遗传算法参数
-    int pop_size = 1000;          // 种群大小
+    int pop_size = 1000;         // 种群大小
     double mutation_rate = 0.4;  // 变异率
     double crossover_rate = 0.5; // 交叉率
     int args_number = g_arg;     // 每个个体的基因数（假设我们有x和y两个基因）
