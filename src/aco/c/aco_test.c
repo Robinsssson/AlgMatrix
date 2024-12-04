@@ -9,13 +9,13 @@
 // 定义城市坐标
 static double city_coords_data[CITY_COUNT][2] = {
     {0.0, 0.0},   // 城市 0
-    {22.0, 0.0},   // 城市 1
+    {22.0, 0.0},  // 城市 1
     {1.0, 100.0}, // 城市 2
     {0.0, 1.0},   // 城市 3
-    {12.0, 0.0},   // 城市 0
+    {12.0, 0.0},  // 城市 0
     {1.0, 8.0},   // 城市 1
     {7.0, 100.0}, // 城市 2
-    {5.0, 12.0}    // 城市 3
+    {5.0, 12.0}   // 城市 3
 };
 
 // 将城市坐标数据转化为 alg_matrix
@@ -37,7 +37,7 @@ static void test_aco(void) {
     double beta = 2.0;  // 启发式信息的重要性
     double rho = 0.1;   // 信息素蒸发率
     int number = 10;    // 蚂蚁的数量
-
+    int iter = 100;
     // 3. 初始化 ACO 算法
     aco_handle *aco = aco_init(number, city_coords, alpha, beta, rho);
     if (aco == NULL) {
@@ -46,20 +46,21 @@ static void test_aco(void) {
     }
 
     // 4. 执行 ACO 算法，寻找最短路径
-    if (aco_fresh(aco) != ALG_OK) {
-        printf("ACO algorithm failed!\n");
-        aco_free(aco);
-        return;
-    }
+    for (int it = 0; it < iter; it++) {
+        if (aco_fresh(aco) != ALG_OK) {
+            printf("ACO algorithm failed!\n");
+            aco_free(aco);
+            return;
+        }
+        // 5. 输出最佳路径和路径长度
+        printf("Best path: ");
+        for (int i = 0; i < CITY_COUNT; i++) {
+            printf("%d ", (int)*alg_vector_get_val(aco->best_path, i));
+        }
+        printf("\n");
 
-    // 5. 输出最佳路径和路径长度
-    printf("Best path: ");
-    for (int i = 0; i < CITY_COUNT; i++) {
-        printf("%d ", (int)*alg_vector_get_val(aco->best_path, i));
+        printf("Best path length: %f\n", aco->best_length);
     }
-    printf("\n");
-
-    printf("Best path length: %f\n", aco->best_length);
 
     // 6. 释放 ACO 算法的资源
     aco_free(aco);

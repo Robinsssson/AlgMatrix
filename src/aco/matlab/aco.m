@@ -4,9 +4,8 @@ clear;
 close all;
 
 % 1. 初始化
-N = 5; % 城市数
-city_coords = rand(N, 2); % 每个城市的x, y坐标，随机生成
-
+N = 8; % 城市数
+city_coords = [0, 0; 22, 0; 1, 100; 0, 1; 12, 0; 1, 8; 7, 100; 5, 12];
 % 计算城市间的欧几里得距离
 dist = zeros(N, N); % 初始化距离矩阵
 for i = 1:N
