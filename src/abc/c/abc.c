@@ -12,7 +12,7 @@ static void abc_fresh_fitness(abc_handle *handle);
 
 abc_handle *abc_init(int food_number, int dimension, double lower_bound, double upper_bound, int limit,
                      evaluate_function evaluate) {
-    abc_handle *handle = ALG_MALLOC(sizeof(abc_handle));
+    abc_handle *handle = ALG_MALLOC(sizeof(abc_handle) + sizeof(int) * (size_t)(food_number));
     if (handle == NULL) {
         ERROR("HANDLE INIT ERROR");
         return NULL;
@@ -38,6 +38,10 @@ abc_handle *abc_init(int food_number, int dimension, double lower_bound, double 
 
     handle->employed_bees = alg_matrix_copy(handle->food_matrix);
     handle->onlooker_bees = alg_matrix_copy(handle->food_matrix);
+
+    for (int i = 0; i < food_number; i++) {
+        handle->trial[i] = 0;
+    }
 
     return handle;
 }

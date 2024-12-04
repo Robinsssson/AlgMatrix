@@ -11,11 +11,25 @@ alg_matrix *alg_matrix_create(int row, int col) {
         ERROR("ERROR IN CREATE MATRIX WITH NAGETIVE ROW OR COL");
         return NULL;
     }
-    alg_matrix *mat =
-        (alg_matrix *)ALG_MALLOC(sizeof(alg_matrix) + sizeof(alg_val_type) * (unsigned)row * (unsigned)col);
+    alg_matrix *mat = ALG_MALLOC(sizeof(alg_matrix) + sizeof(alg_val_type) * (unsigned)row * (unsigned)col);
     if (mat == NULL)
         return NULL;
 
+    mat->col = col;
+    mat->row = row;
+    return mat;
+}
+
+alg_matrix *alg_matrix_create_val(int row, int col, alg_val_type val) {
+    if (row < 0 || col < 0) {
+        ERROR("ERROR IN CREATE MATRIX WITH NAGETIVE ROW OR COL");
+        return NULL;
+    }
+    alg_matrix *mat = ALG_MALLOC(sizeof(alg_matrix) + sizeof(alg_val_type) * (unsigned)row * (unsigned)col);
+    if (mat == NULL)
+        return NULL;
+    for (int i = 0; i < row * col; i++)
+        mat->mat[i] = val;
     mat->col = col;
     mat->row = row;
     return mat;

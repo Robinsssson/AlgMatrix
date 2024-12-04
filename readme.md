@@ -16,9 +16,15 @@ $$
 
 ### 遗传算法 - Genetic Algorithm (GA)
 
+1
+
 ### 粒子群算法 - Particle Swarm Optimization (PSO)
 
+1
+
 ### 蚁群算法 - Ant Colony Optimization (ACO)
+
+1
 
 ### 模拟退火算法 - Simulated Annealing (SA)
 
@@ -27,6 +33,8 @@ $$
 ### 布谷鸟算法 - Cuckoo Search (CS)
 
 ### 蜂群算法 - Artificial Bee Colony (ABC) Algorithm
+
+1
 
 ### 免疫算法 - Artificial Immune Algorithm (AIA)
 

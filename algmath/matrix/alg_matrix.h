@@ -17,6 +17,15 @@ typedef struct __alg_matrix alg_matrix;
 ALG_MATH_API alg_matrix *alg_matrix_create(int row, int col);
 
 /**
+ * @brief 创建一个矩阵对象
+ *
+ * @param row 矩阵的行数
+ * @param col 矩阵的列数
+ * @return 返回指向新创建矩阵的指针，如果创建失败则返回 NULL
+ */
+ALG_MATH_API alg_matrix *alg_matrix_create_val(int row, int col, alg_val_type val);
+
+/**
  * @brief 为矩阵对象赋值
  *
  * @param matrix 指向要设置值的矩阵对象

@@ -13,6 +13,7 @@ typedef struct {
     double (*evaluate)(alg_vector *food);
     alg_matrix *employed_bees, *onlooker_bees;
     alg_vector *fitness;
+    int trial[];
 } abc_handle;
 
 typedef double (*evaluate_function)(alg_vector *food);
