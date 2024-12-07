@@ -68,13 +68,6 @@ static void search_new_food(abc_handle *handle, alg_vector *current_food) {
     alg_vector_free(step);
 }
 
-static double vector_sum(alg_vector *vec) {
-    double ret = 0.0;
-    for (int i = 0; i < vec->size; i++)
-        ret += vec->vector[i];
-    return ret;
-}
-
 static double alg_safe_divide(double numerator, double denominator) {
     if (fabs(denominator) < 1e-9) {
         // 除数为零，返回 NaN (Not a Number)
@@ -125,7 +118,7 @@ alg_state abc_fresh(abc_handle *handle) {
     }
 
     // 2. 观察者蜜蜂搜索阶段
-    sum = vector_sum(handle->fitness); // 计算适应度的总和
+    sum = alg_vector_sum(handle->fitness); // 计算适应度的总和
     for (int i = 0; i < handle->food_number; i++) {
         prob = alg_safe_divide(handle->fitness->vector[i], sum); // 计算选择该食物源的概率
         if (__isnan(prob)) {

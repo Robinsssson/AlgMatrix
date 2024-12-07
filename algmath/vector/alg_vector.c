@@ -153,6 +153,18 @@ alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_vector *dest_ve
 
     return ALG_OK;
 }
+
+int alg_vector_compare_val(const alg_vector *src_vector, int (*ptr_compare)(const void *, const void *)) {
+    int size = src_vector->size, index = 0;
+    alg_val_type local_val = src_vector->vector[0];
+    for (int i = 1; i < size; i++) {
+        if (ptr_compare(&local_val, src_vector->vector + i) < 0)
+            continue;
+        index = i;
+        local_val = *(src_vector->vector + i);
+    }
+    return index;
+}
 // {1, 2, 3, 4, 5, 6} size = 6
 // [1:2] {2}
 // [1:5] {2, 3, 4, 5}
@@ -263,4 +275,11 @@ alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vect
     }
 
     return ALG_OK;
+}
+
+alg_val_type alg_vector_sum(const alg_vector *vec) {
+    alg_val_type val = 0.0;
+    for (int i = 0; i < vec->size; i++)
+        val += vec->vector[i];
+    return val;
 }

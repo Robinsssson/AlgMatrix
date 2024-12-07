@@ -89,6 +89,14 @@ ALG_MATH_API alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_ve
                                             int (*ptr_compare)(const void *, const void *));
 
 /**
+ * @brief 获取vector compare
+ *
+ * @param src_vector  指向原始向量对象的指针
+ * @param ptr_compare 比较函数指针
+ * @return int 返回所指向的值
+ */
+ALG_MATH_API int alg_vector_compare_val(const alg_vector *src_vector, int (*ptr_compare)(const void *, const void *));
+/**
  * @brief 输出数组切片
  *
  * @param vector 指向向量对象的指针
@@ -111,6 +119,8 @@ ALG_MATH_API alg_state alg_vector_ensure_caps_inplace(alg_vector **ptr_vector);
 
 ALG_MATH_API alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vector *src_vector,
                                                  enum alg_vector_concat concat);
+
+ALG_MATH_API alg_val_type alg_vector_sum(const alg_vector *vec);
 #ifdef __cplusplus
 }
 #endif

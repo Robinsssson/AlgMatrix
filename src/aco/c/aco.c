@@ -50,13 +50,6 @@ aco_handle *aco_init(int number, alg_matrix *city_coords, double alpha, double b
     return aco;
 }
 
-static alg_val_type alg_vector_sum(const alg_vector *vec) {
-    alg_val_type val = 0.0;
-    for (int i = 0; i < vec->size; i++)
-        val += vec->vector[i];
-    return val;
-}
-
 static int roulette_wheel_selection(alg_vector *probabilities) {
     alg_vector *copy = alg_vector_create_like(probabilities);
     if (!copy) {
