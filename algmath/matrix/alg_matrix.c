@@ -420,9 +420,9 @@ alg_state alg_matrix_concat(alg_matrix **dest_matrix, alg_matrix *src_matrix, en
         case CONCAT_AXIS_RX: // 右侧拼接，行数相同，列数增加
             INTERATOR_MATRIX(*dest_matrix, i, j) {
                 // 判断是否在目标矩阵的列范围外
-                if (j >= (*dest_matrix)->col) {
+                if (j >= copy_matrix->col) {
                     // 如果超出目标矩阵的列范围，从源矩阵获取值，位置偏移目标矩阵的列数
-                    const alg_val_type val = *alg_matrix_get_pos_val(src_matrix, i, j - (*dest_matrix)->col);
+                    const alg_val_type val = *alg_matrix_get_pos_val(src_matrix, i, j - copy_matrix->col);
                     alg_matrix_set_val((*dest_matrix), i, j, val);
                 } else {
                     // 否则，保持原位置，从目标矩阵获取值
@@ -450,9 +450,9 @@ alg_state alg_matrix_concat(alg_matrix **dest_matrix, alg_matrix *src_matrix, en
         case CONCAT_AXIS_DY: // 下侧拼接，列数相同，行数增加
             INTERATOR_MATRIX(*dest_matrix, i, j) {
                 // 判断是否在目标矩阵的行范围外
-                if (i >= (*dest_matrix)->row) {
+                if (i >= copy_matrix->row) {
                     // 如果超出目标矩阵的行范围，从源矩阵获取值，位置偏移目标矩阵的行数
-                    const alg_val_type val = *alg_matrix_get_pos_val(src_matrix, i - (*dest_matrix)->row, j);
+                    const alg_val_type val = *alg_matrix_get_pos_val(src_matrix, i - copy_matrix->row, j);
                     alg_matrix_set_val((*dest_matrix), i, j, val);
                 } else {
                     // 否则，保持原位置，从目标矩阵获取值

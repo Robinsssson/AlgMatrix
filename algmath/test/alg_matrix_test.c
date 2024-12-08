@@ -1,4 +1,6 @@
+#include "alg_inc.h"
 #include "algmath.h"
+#include "matrix/alg_matrix.h"
 #include "test_framework.h"
 #include <stdio.h>
 
@@ -263,6 +265,56 @@ static int test_alg_matrix_concat(void) {
     }
     alg_matrix_free(mat1);
     alg_matrix_free(mat2);
+
+    alg_matrix *mat = alg_matrix_create(6, 6);
+    double arr[6][6] = {
+        {1, 2, 3, 4, 5, 6},       {7, 8, 9, 10, 11, 12},    {13, 14, 15, 16, 17, 18},
+        {19, 20, 21, 22, 23, 24}, {25, 26, 27, 28, 29, 30}, {31, 32, 33, 34, 35, 36},
+    };
+
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 6; j++) {
+            alg_matrix_set_val(mat, i, j, arr[i][j]);
+        }
+    }
+    alg_matrix *mat3, *mat4, *mat5, *mat6;
+    mat3 = alg_matrix_create(3, 3);
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            alg_matrix_set_val(mat3, i, j, arr[i][j]);
+        }
+    }
+    mat4 = alg_matrix_create(3, 3);
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            alg_matrix_set_val(mat4, i, j, arr[i+3][j]);
+        }
+    }
+    mat5 = alg_matrix_create(3, 3);
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            alg_matrix_set_val(mat5, i, j, arr[i][j+3]);
+        }
+    }
+    mat6 = alg_matrix_create(3, 3);
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            alg_matrix_set_val(mat6, i, j, arr[i+3][j+3]);
+        }
+    }
+    alg_matrix_concat(&mat3, mat4, CONCAT_AXIS_DY);
+    alg_matrix_concat(&mat6, mat5, CONCAT_AXIS_UY);
+    alg_matrix_concat(&mat3, mat6, CONCAT_AXIS_RX);
+    char *str = alg_matrix_print_str(mat);
+    char *str3 = alg_matrix_print_str(mat3);
+    TESTLOG_ARGS("mat = %s", str);
+    TESTLOG_ARGS("mat3 = %s", str3);
+    for (int i = 0; i < 6; i++) {
+        for (int j = 0; j < 6; j++) {
+            if (!FLOAT_COMPARE_IS(*alg_matrix_get_pos_val(mat, i, j), *alg_matrix_get_pos_val(mat3, i, j)))
+                return TEST_FAILED;
+        }
+    }
     return TEST_PASSED;
 }
 

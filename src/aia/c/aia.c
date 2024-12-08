@@ -70,20 +70,23 @@ static alg_matrix *clone_and_mutate(aia_handle *handle) {
     int len = handle->num_antibodies;
     int number_clones[len];
 
+    // 防止除零溢出
     alg_vector *div_fitness = alg_vector_create_like(handle->fitness);
     for (int i = 0; i < div_fitness->size; i++) {
-        div_fitness->vector[i] = 1 / div_fitness->vector[i];
+        div_fitness->vector[i] = 1 / (handle->fitness->vector[i] + 1e-6);
     }
+
     double sum_val = alg_vector_sum(div_fitness);
     int sum = 0;
     for (int i = 0; i < div_fitness->size; i++) {
-        number_clones[i] = handle->clone_factor * (int)ceil(div_fitness->vector[i] / sum_val) * handle->population->row;
+        number_clones[i] = (int)ceil(handle->clone_factor * div_fitness->vector[i] / sum_val);
         sum += number_clones[i];
     }
+
     alg_matrix *clones = alg_matrix_create(sum, handle->dimension);
     int count = 0;
-    for (int i = 0; i < handle->num_antibodies; i++) {
-        for (int j = 0; j < number_clones[len]; j++) {
+    for (int i = 0; i < len; i++) {
+        for (int j = 0; j < number_clones[i]; j++) { // 修正为 number_clones[i]
             alg_vector *clone = alg_vector_from_matrix_row(handle->population, i);
             for (int iter = 0; iter < clone->size; iter++) {
                 clone->vector[iter] +=
@@ -95,6 +98,7 @@ static alg_matrix *clone_and_mutate(aia_handle *handle) {
             alg_vector_free(clone);
         }
     }
+    alg_vector_free(div_fitness); // 避免内存泄漏
     return clones;
 }
 
@@ -113,17 +117,22 @@ static void select_new_population(aia_handle *handle, alg_matrix **clones) {
 }
 
 alg_state aia_fresh(aia_handle *handle) {
-    evaluate_fitness(handle);
+    evaluate_fitness_(handle);
     int index = alg_vector_compare_val(handle->fitness, alg_utils_greater);
     double current_best_solve = handle->fitness->vector[index];
     if (current_best_solve < handle->best_fitness) {
+        handle->best_fitness = current_best_solve;
         for (int i = 0; i < handle->dimension; i++)
             handle->best_solve->vector[i] = *alg_matrix_get_pos_val(handle->population, index, i);
     }
     alg_matrix *clones = clone_and_mutate(handle);
     select_new_population(handle, &clones);
+    return ALG_OK;
 }
 
 void aia_free(aia_handle *handle) {
+    alg_vector_free(handle->best_solve);
+    alg_vector_free(handle->fitness);
+    alg_matrix_free(handle->population);
     ALG_FREE(handle);
 }

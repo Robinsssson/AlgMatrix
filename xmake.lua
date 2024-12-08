@@ -58,3 +58,15 @@ target("aco")
         "-Wstrict-prototypes", "-Wmissing-prototypes", 
         "-Wredundant-decls"
     )
+
+target("aia")
+    set_kind("binary")
+    add_files("src/aia/c/*.c")
+    add_deps("algmath")
+    add_includedirs("algmath")
+    add_cflags(
+        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
+        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
+        "-Wstrict-prototypes", "-Wmissing-prototypes", 
+        "-Wredundant-decls"
+    )
