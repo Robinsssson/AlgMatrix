@@ -70,3 +70,16 @@ target("aia")
         "-Wstrict-prototypes", "-Wmissing-prototypes", 
         "-Wredundant-decls"
     )
+
+target("sa")
+    set_kind("binary")
+    add_files("src/sa/c/*.c")
+    add_deps("algmath")
+    add_includedirs("algmath")
+    add_cflags(
+        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
+        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
+        "-Wstrict-prototypes", "-Wmissing-prototypes", 
+        "-Wredundant-decls"
+    )
+
