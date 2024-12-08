@@ -1,4 +1,4 @@
-function immune_algorithm()
+function aia()
     % 参数设置
     num_antibodies = 50;       % 抗体数量
     clone_factor = 5;          % 克隆倍数
@@ -61,7 +61,7 @@ function clones = clone_and_mutate(antibodies, fitness, clone_factor, mutation_r
         for j = 1:num_clones(i)
             clone = antibodies(i, :) + mutation_rate * (rand(size(antibodies, 2), 1) - 0.5)' * (range(2) - range(1));
             clone = max(min(clone, range(2)), range(1)); % 确保在范围内
-            clones = [clones; clone];
+            clones = [clones; clone]; %#ok<AGROW>
         end
     end
 end
