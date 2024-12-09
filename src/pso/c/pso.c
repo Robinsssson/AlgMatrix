@@ -13,7 +13,7 @@ static void pso_free_internal(pso_handle *pso_structure) {
     ALG_FREE(pso_structure->p_best_fitness);
 }
 
-pso_handle *pso_init(int number, int dim, double w, double c1, double c2, pso_aim_function function, pso_type type) {
+pso_handle *pso_init(int number, int dim, double w, double c1, double c2, optimization function, pso_type type) {
     pso_handle *pso_structure = ALG_MALLOC(sizeof(pso_handle));
     if (!pso_structure)
         return NULL;

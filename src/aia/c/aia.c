@@ -1,10 +1,4 @@
 #include "aia.h"
-#include "alg_inc.h"
-#include "matrix/alg_matrix.h"
-#include "memalloc/alg_memalloc.h"
-#include "random/alg_random.h"
-#include "utils/alg_utils.h"
-#include "vector/alg_vector.h"
 #include <math.h>
 aia_handle *aia_init(int num_antibodies, int clone_factor, int dimension, double mutation_rate, double llim,
                      double rlim, optimization function) {

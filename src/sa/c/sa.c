@@ -1,9 +1,4 @@
 #include "sa.h"
-#include "alg_inc.h"
-#include "memalloc/alg_memalloc.h"
-#include "random/alg_random.h"
-#include "vector/alg_vector.h"
-#include <stdio.h>
 
 sa_handle *sa_init(int dim, double temperature, double cooling_rate, double llim, double rlim, optimization function) {
     sa_handle *handle = ALG_MALLOC(sizeof(sa_handle));

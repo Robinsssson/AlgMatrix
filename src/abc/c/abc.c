@@ -11,7 +11,7 @@
 static void abc_fresh_fitness(abc_handle *handle);
 
 abc_handle *abc_init(int food_number, int dimension, double lower_bound, double upper_bound, int limit,
-                     evaluate_function evaluate) {
+                     optimization function) {
     abc_handle *handle = ALG_MALLOC(sizeof(abc_handle) + sizeof(int) * (size_t)(food_number));
     if (handle == NULL) {
         ERROR("HANDLE INIT ERROR");
@@ -21,7 +21,7 @@ abc_handle *abc_init(int food_number, int dimension, double lower_bound, double 
     handle->lower_bound = lower_bound;
     handle->upper_bound = upper_bound;
     handle->limit = limit;
-    handle->evaluate = evaluate;
+    handle->function = function;
 
     handle->food_matrix = alg_matrix_create(food_number, dimension);
     if (handle->food_matrix == NULL) {
@@ -49,7 +49,7 @@ abc_handle *abc_init(int food_number, int dimension, double lower_bound, double 
 static void abc_fresh_fitness(abc_handle *handle) {
     for (int i = 0; i < handle->food_number; i++) {
         alg_vector *tmp_vector = alg_vector_from_matrix_row(handle->food_matrix, i);
-        alg_vector_set_val(handle->fitness, i, handle->evaluate(tmp_vector));
+        alg_vector_set_val(handle->fitness, i, handle->function(tmp_vector));
         alg_vector_free(tmp_vector);
     }
 }
@@ -106,7 +106,7 @@ alg_state abc_fresh(abc_handle *handle) {
     for (int i = 0; i < handle->food_number; i++) {
         new_food = alg_vector_from_matrix_row(handle->employed_bees, i);
         search_new_food(handle, new_food);
-        new_fitness = handle->evaluate(new_food);
+        new_fitness = handle->function(new_food);
         if (new_fitness < handle->fitness->vector[i]) {
             // 更新食物源和适应度
             alg_vector_set_val(handle->fitness, i, new_fitness);
@@ -135,7 +135,7 @@ alg_state abc_fresh(abc_handle *handle) {
         // 选择该食物源进行局部搜索
         new_food = alg_vector_from_matrix_row(handle->onlooker_bees, i);
         search_new_food(handle, new_food);
-        new_fitness = handle->evaluate(new_food);
+        new_fitness = handle->function(new_food);
         if (new_fitness < handle->fitness->vector[i]) {
             // 更新食物源和适应度
             alg_vector_set_val(handle->fitness, i, new_fitness);

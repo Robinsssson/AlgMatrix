@@ -1,43 +1,12 @@
-# Algthrim All
+# algmatix
 
-## 优化算法
+## 使用方法
 
-优化算法的目标是解决一系列如
-$$
-    find\ \ \ \ \ \ \ \ X \in \ \R^3 \\
-    s.t. \ \ \ \ \ \ \ \ \ \ G(X)<0 \\
-    max/min \ \ \ \  fitness(X)
-$$
+### 下载
 
-在本文中，统一使用`optimization`函数代表解决上述一系列问题
-算法列表如下
+本项目采用xmake进行项目组织，通过[开始链接](https://xmake.io/#/getting_started)获取xmake下载方式。
+确保系统路径含有`gcc`编译器，使用`gcc -v`进行判断。
 
-## 算法原理讲解
+### 构建方法
 
-### 遗传算法 - Genetic Algorithm (GA)
-
-1
-
-### 粒子群算法 - Particle Swarm Optimization (PSO)
-
-1
-
-### 蚁群算法 - Ant Colony Optimization (ACO)
-
-1
-
-### 模拟退火算法 - Simulated Annealing (SA)
-
-### 鸡群算法 - Chicken Swarm Optimization (CSO)
-
-### 布谷鸟算法 - Cuckoo Search (CS)
-
-### 蜂群算法 - Artificial Bee Colony (ABC) Algorithm
-
-1
-
-### 免疫算法 - Artificial Immune Algorithm (AIA)
-
-### 分布估计算法 - Estimation of Distribution Algorithm (EDA)
-
-### 差分进化算法 - Differential Evolution (DE)
+使用`xmake b`进行项目构建。

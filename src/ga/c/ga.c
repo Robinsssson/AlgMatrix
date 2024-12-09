@@ -15,7 +15,7 @@
         ALG_FREE(strs);                                                                                                \
     } while (0)
 // 初始化遗传算法结构体
-ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, ga_aim_function function, int args_number,
+ga_handle *ga_init(int pop_size, double mutation_rate, double crossover_rate, optimization function, int args_number,
                    double var_max, double var_min) {
     ga_handle *ga = ALG_MALLOC(sizeof(ga_handle));
     if (ga == NULL)

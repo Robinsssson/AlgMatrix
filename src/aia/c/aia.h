@@ -1,7 +1,7 @@
 #ifndef __AIA_H
 #define __AIA_H
-#include <algmath.h>
-typedef double (*optimization)(alg_vector *);
+#include "../../basic_opti.h"
+
 typedef struct {
     int clone_factor, dimension, num_antibodies;
     double llim, rlim, best_fitness, mutation_rate;

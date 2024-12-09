@@ -1,9 +1,8 @@
 #ifndef __SA_H
 #define __SA_H
 
-#include "alg_inc.h"
-#include "algmath.h"
-typedef double (*optimization)(alg_vector *);
+#include "../../basic_opti.h"
+
 typedef struct {
     int dim;
     alg_vector *current_solution;
