@@ -12,8 +12,7 @@ function cso_demo
 
     % 初始化鸡群
     pos = lb + (ub - lb) * rand(n, dim); % 鸡群位置
-    fitness = arrayfun(fnc, pos);        % 计算适应值
-
+    fitness = arrayfun(fnc, pos);        % 计算适应值  
     % 角色分配
     [~, sortedIdx] = sort(fitness);
     roosters = sortedIdx(1:rf);            % 公鸡索引
