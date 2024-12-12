@@ -7,21 +7,10 @@
 #define TEST_FAILED 1
 
 // 颜色控制代码
-#if defined(_WIN32)
-
 #define COLOR_RESET "\033[0m"
 #define COLOR_PASS "\033[32m" // 绿色
 #define COLOR_FAIL "\033[31m" // 红色
 #define COLOR_BOLD "\033[1m"  // 加粗
-
-#else
-
-#define COLOR_RESET
-#define COLOR_PASS
-#define COLOR_FAIL
-#define COLOR_BOLD
-
-#endif
 
 // Test case structure
 typedef struct {

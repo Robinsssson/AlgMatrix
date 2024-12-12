@@ -85,9 +85,11 @@ ALG_MATH_API char *alg_vector_print_str(const alg_vector *vector);
  * @param ptr_compare 在"alg_utils.h"中定义的函数
  * @return char* 指向创建的向量对象的指针，失败时返回 NULL
  */
-ALG_MATH_API alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_vector *dest_vector, int *sort_index,
-                                            int (*ptr_compare)(const void *, const void *));
+alg_state alg_vector_sort_copy(alg_vector *dest_vector, const alg_vector *src_vector, int *sort_index,
+                               int (*ptr_compare)(const void *, const void *));
 
+ALG_MATH_API alg_state alg_vector_sort_inplace(alg_vector *src_vector, int *sort_index, alg_boolean change_flag,
+                                               int (*ptr_compare)(const void *, const void *));
 /**
  * @brief 获取vector compare
  *
@@ -111,16 +113,20 @@ ALG_MATH_API alg_vector *alg_vector_slice(const alg_vector *vector, int range_l,
  * @return alg_vector* 指向创建的向量对象的指针，失败时返回 NULL
  */
 ALG_MATH_API alg_vector *alg_vector_create_like(const alg_vector *vector);
+
 enum alg_vector_concat {
     ALG_VECTOR_CONCAT_L,
     ALG_VECTOR_CONCAT_R,
 };
+
 ALG_MATH_API alg_state alg_vector_ensure_caps_inplace(alg_vector **ptr_vector);
 
 ALG_MATH_API alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, const alg_vector *src_vector,
                                                  enum alg_vector_concat concat);
 
 ALG_MATH_API alg_val_type alg_vector_sum(const alg_vector *vec);
+
+ALG_MATH_API alg_state alg_vector_claim(alg_vector *vec, alg_val_type l_range, alg_val_type r_range);
 #ifdef __cplusplus
 }
 #endif

@@ -1,6 +1,7 @@
 #ifndef __ALG_INC_H__
 #define __ALG_INC_H__
 #include <assert.h>
+#include <math.h>
 
 #ifdef _WIN32     // Windows平台
 #ifdef ALG_EXPORT // 定义在编译动态库时设置的宏
@@ -112,6 +113,11 @@ typedef struct {
     void *(*alg_memalloc_calloc)(unsigned long long, unsigned long long);
 #endif
 } alg_memalloc_hook;
+
+#define FLOAT_COMPARE_IS(val1, val2) (fabs(val1 - val2) < 1e-9)
+#define MATH_CLAIM(x, min, max) (x > max ? max : (x < min ? min : x))
+
+typedef enum { ALG_FALSE = 0, ALG_TRUE = !ALG_FALSE } alg_boolean;
 
 #ifdef __cplusplus
 }

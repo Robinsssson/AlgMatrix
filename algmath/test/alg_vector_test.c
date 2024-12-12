@@ -1,4 +1,3 @@
-#include "alg_inc.h"
 #include "algmath.h"
 #include "test_framework.h"
 #include <math.h>
@@ -112,7 +111,7 @@ static int test_alg_vector_sort_copy(void) {
     TESTLOG("START SORTED");
     alg_vector *sorted_vec = alg_vector_create(test_number, 0.0f);
     int sort_index[test_number];
-    if (alg_vector_sort_copy(vec, sorted_vec, sort_index, alg_utils_greater) != ALG_OK) {
+    if (alg_vector_sort_copy(sorted_vec, vec, sort_index, alg_utils_greater) != ALG_OK) {
         alg_vector_free(vec);
         alg_vector_free(sorted_vec);
         return TEST_FAILED;

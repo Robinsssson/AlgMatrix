@@ -125,7 +125,7 @@ char *alg_vector_print_str(const alg_vector *vector) {
     return str;
 }
 
-alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_vector *dest_vector, int *sort_index,
+alg_state alg_vector_sort_copy(alg_vector *dest_vector, const alg_vector *src_vector, int *sort_index,
                                int (*ptr_compare)(const void *, const void *)) {
     // Ensure the destination vector has enough space to hold the source data
     if (dest_vector->caps < src_vector->size) {
@@ -150,7 +150,32 @@ alg_state alg_vector_sort_copy(const alg_vector *src_vector, alg_vector *dest_ve
             }
         }
     }
+    return ALG_OK;
+}
 
+alg_state alg_vector_sort_inplace(alg_vector *src_vector, int *sort_index, alg_boolean change_flag,
+                                  int (*ptr_compare)(const void *, const void *)) {
+    alg_vector *dest_vector = alg_vector_create_like(src_vector);
+
+    // Sort the destination vector
+    if (change_flag == ALG_TRUE)
+        qsort(src_vector->vector, (size_t)src_vector->size, sizeof(alg_val_type), ptr_compare);
+    else
+        qsort(dest_vector->vector, (size_t)dest_vector->size, sizeof(alg_val_type), ptr_compare);
+
+    // If sort_index is provided, fill it with the original indices
+    if (sort_index != NULL) {
+        for (int i = 0; i < dest_vector->size; i++) {
+            for (int j = 0; j < src_vector->size; j++) {
+                // Floating-point comparison with tolerance
+                if (fabs(dest_vector->vector[i] - src_vector->vector[j]) < 1e-9) {
+                    sort_index[i] = j;
+                    break;
+                }
+            }
+        }
+    }
+    alg_vector_free(dest_vector);
     return ALG_OK;
 }
 
@@ -282,4 +307,11 @@ alg_val_type alg_vector_sum(const alg_vector *vec) {
     for (int i = 0; i < vec->size; i++)
         val += vec->vector[i];
     return val;
+}
+
+alg_state alg_vector_claim(alg_vector *vec, alg_val_type l_range, alg_val_type r_range) {
+    for (int i = 0; i < vec->size; i++) {
+        vec->vector[i] = MATH_CLAIM(vec->vector[i], l_range, r_range);
+    }
+    return ALG_OK;
 }

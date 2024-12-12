@@ -69,7 +69,7 @@ alg_state eda_fresh(eda_handle *handle) {
         handle->best_solve->vector[i] = *alg_matrix_get_pos_val(handle->population, index, i);
     handle->best_val = handle->fitness->vector[index];
     alg_vector *sorted_fitness = alg_vector_create_like(handle->fitness);
-    alg_vector_sort_copy(handle->fitness, sorted_fitness, sorted_index, alg_utils_greater);
+    alg_vector_sort_copy(sorted_fitness, handle->fitness, sorted_index, alg_utils_greater);
     int elite_count = (int)round(handle->elitism_rate * handle->population_size);
     alg_matrix *elites = alg_matrix_create(elite_count, handle->dim);
     for (int i = 0; i < elite_count; i++) {

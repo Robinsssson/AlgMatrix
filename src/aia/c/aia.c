@@ -101,7 +101,7 @@ static void select_new_population(aia_handle *handle, alg_matrix **clones) {
     alg_vector *fitness = evaluate_fitness(handle, *clones);
     alg_vector *copy_fitness = alg_vector_create_like(fitness);
     int sorted_indices[fitness->size];
-    alg_vector_sort_copy(fitness, copy_fitness, sorted_indices, alg_utils_greater);
+    alg_vector_sort_copy(copy_fitness, fitness, sorted_indices, alg_utils_greater);
     for (int i = 0; i < handle->population->row; i++)
         for (int j = 0; j < handle->population->col; j++) {
             alg_matrix_set_val(handle->population, i, j, *alg_matrix_get_pos_val(*clones, sorted_indices[i], j));

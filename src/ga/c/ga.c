@@ -85,7 +85,7 @@ static alg_state sort_base_on_fitness(ga_handle *ga) {
     }
     int array[ga->pop_size];
     // base on fitness to copy in tmp_out and get index of array
-    alg_vector_sort_copy(ga->fitness, tmp_out, array, alg_utils_greater);
+    alg_vector_sort_copy(tmp_out, ga->fitness, array, alg_utils_greater);
     alg_matrix *copy_population = alg_matrix_copy(ga->population);
     if (copy_population == NULL) {
         ERROR("COPY POPULATION IS FAIL");
@@ -232,12 +232,7 @@ void ga_fresh(ga_handle *ga) {
 void ga_free(ga_handle *ga) {
     if (ga == NULL)
         return;
-
-    if (ga->population != NULL)
-        alg_matrix_free(ga->population); // 释放种群矩阵
-
-    if (ga->fitness != NULL)
-        alg_vector_free(ga->fitness); // 释放适应度向量
-
+    alg_matrix_free(ga->population); // 释放种群矩阵
+    alg_vector_free(ga->fitness); // 释放适应度向量
     ALG_FREE(ga); // 释放GA结构体内存
 }
