@@ -18,7 +18,7 @@ target("algmath")
 
 target("test-algmath-vector")
     set_kind("binary")
-    add_files("test/alg_vector_test.c", "test/test_framework.c")
+    add_files("test/alg_vector_test.c", "test/test_framework.c", "test/debug_memory.c")
     add_deps("algmath")
     add_includedirs(".")
     if is_plat("windows") then
@@ -35,7 +35,7 @@ target("test-algmath-vector")
 
 target("test-algmath-matrix")
     set_kind("binary")
-    add_files("test/alg_matrix_test.c", "test/test_framework.c")
+    add_files("test/alg_matrix_test.c", "test/test_framework.c", "test/debug_memory.c")
     add_deps("algmath")
     add_includedirs(".")
     if is_plat("windows") then

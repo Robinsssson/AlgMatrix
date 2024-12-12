@@ -1,10 +1,7 @@
 #ifndef __EDA_H
 #define __EDA_H
 
-#include "alg_inc.h"
-#include <algmath.h>
-
-typedef double (*optimization)(alg_vector *);
+#include "../../basic_opti.h"
 
 typedef struct {
     int dim, population_size;

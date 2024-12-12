@@ -1,8 +1,20 @@
 #include "alg_inc.h"
 #include "algmath.h"
 #include "matrix/alg_matrix.h"
+#include "memalloc/alg_memalloc.h"
 #include "test_framework.h"
 #include <stdio.h>
+
+#define STR(n) str##n
+#define __PRINT(matrix, str)                                                                                           \
+    do {                                                                                                               \
+        char *str = alg_matrix_print_str(matrix);                                                                      \
+        printf(#matrix " is %s", str);                                                                                 \
+        ALG_FREE(str);                                                                                                 \
+    } while (0)
+
+// 改进后的版本，避免参数冲突并且增强可读性
+#define PRINT(matrix) print_matrix(matrix, #matrix)
 
 // Test: Create a matrix with given rows and columns
 static int test_alg_matrix_create(void) {
@@ -18,6 +30,7 @@ static int test_alg_matrix_create(void) {
     }
 
     alg_matrix_free(mat);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -34,6 +47,7 @@ static int test_alg_matrix_set_and_get_val(void) {
     }
 
     alg_matrix_free(mat);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -55,6 +69,7 @@ static int test_alg_matrix_get_index_val(void) {
     }
 
     alg_matrix_free(mat);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -95,6 +110,7 @@ static int test_alg_matrix_add(void) {
     alg_matrix_free(mat1);
     alg_matrix_free(mat2);
     alg_matrix_free(result);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -135,6 +151,7 @@ static int test_alg_matrix_subtraction(void) {
     alg_matrix_free(mat1);
     alg_matrix_free(mat2);
     alg_matrix_free(result);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -166,6 +183,7 @@ static int test_alg_matrix_dot_number(void) {
 
     alg_matrix_free(mat);
     alg_matrix_free(result);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -200,18 +218,9 @@ static int test_alg_matrix_transpose(void) {
 
     alg_matrix_free(mat);
     alg_matrix_free(transposed_mat);
+    check_memory_leaks();
     return TEST_PASSED;
 }
-#define STR(n) str##n
-#define __PRINT(matrix, str)                                                                                           \
-    do {                                                                                                               \
-        char *str = alg_matrix_print_str(matrix);                                                                      \
-        printf(#matrix " is %s", str);                                                                                 \
-        ALG_FREE(str);                                                                                                 \
-    } while (0)
-
-// 改进后的版本，避免参数冲突并且增强可读性
-#define PRINT(matrix) print_matrix(matrix, #matrix)
 
 static void print_matrix(alg_matrix *matrix, char strname[]) {
     char *str = alg_matrix_print_str(matrix); // 获取矩阵的字符串表示
@@ -287,19 +296,19 @@ static int test_alg_matrix_concat(void) {
     mat4 = alg_matrix_create(3, 3);
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            alg_matrix_set_val(mat4, i, j, arr[i+3][j]);
+            alg_matrix_set_val(mat4, i, j, arr[i + 3][j]);
         }
     }
     mat5 = alg_matrix_create(3, 3);
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            alg_matrix_set_val(mat5, i, j, arr[i][j+3]);
+            alg_matrix_set_val(mat5, i, j, arr[i][j + 3]);
         }
     }
     mat6 = alg_matrix_create(3, 3);
     for (int i = 0; i < 3; i++) {
         for (int j = 0; j < 3; j++) {
-            alg_matrix_set_val(mat6, i, j, arr[i+3][j+3]);
+            alg_matrix_set_val(mat6, i, j, arr[i + 3][j + 3]);
         }
     }
     alg_matrix_concat(&mat3, mat4, CONCAT_AXIS_DY);
@@ -309,12 +318,20 @@ static int test_alg_matrix_concat(void) {
     char *str3 = alg_matrix_print_str(mat3);
     TESTLOG_ARGS("mat = %s", str);
     TESTLOG_ARGS("mat3 = %s", str3);
+    ALG_FREE(str);
+    ALG_FREE(str3);
     for (int i = 0; i < 6; i++) {
         for (int j = 0; j < 6; j++) {
             if (!FLOAT_COMPARE_IS(*alg_matrix_get_pos_val(mat, i, j), *alg_matrix_get_pos_val(mat3, i, j)))
                 return TEST_FAILED;
         }
     }
+    alg_matrix_free(mat);
+    alg_matrix_free(mat3);
+    alg_matrix_free(mat4);
+    alg_matrix_free(mat5);
+    alg_matrix_free(mat6);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -325,11 +342,14 @@ static int test_alg_matrix_free(void) {
         return TEST_FAILED;
 
     alg_matrix_free(mat);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
 // Main function to run all tests
 int TEST_MAIN(void) {
+    alg_memalloc_hook hook = {debug_malloc, debug_free, debug_realloc, debug_calloc};
+    alg_memalloc_init(&hook);
     TEST_SCOPE_NEGIN = {INSERT_TEST(test_alg_matrix_create),        INSERT_TEST(test_alg_matrix_add),
                         INSERT_TEST(test_alg_matrix_dot_number),    INSERT_TEST(test_alg_matrix_free),
                         INSERT_TEST(test_alg_matrix_get_index_val), INSERT_TEST(test_alg_matrix_set_and_get_val),

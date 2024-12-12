@@ -3,8 +3,6 @@
 
 #include <stddef.h>
 
-#include "debug_memory.h"
-
 #define TEST_PASSED 0
 #define TEST_FAILED 1
 

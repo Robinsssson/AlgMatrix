@@ -1,4 +1,7 @@
+#include "alg_inc.h"
 #include "algmath.h"
+#include "memalloc/alg_memalloc.h"
+#include "test/debug_memory.h"
 #include "test_framework.h"
 #include <math.h>
 #include <stdio.h>
@@ -32,6 +35,7 @@ static int test_alg_vector_create(void) {
     for (int i = 0; i < test_number; i++) {
         alg_vector_free(vecs[i]);
     }
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -48,6 +52,7 @@ static int test_alg_vector_get_val(void) {
         }
     }
     alg_vector_free(vec);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -62,6 +67,7 @@ static int test_alg_vector_set_val(void) {
         return TEST_FAILED;
     }
     alg_vector_free(vec);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -88,6 +94,7 @@ static int test_alg_vector_insert(void) {
     }
 
     alg_vector_free(vec);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -98,6 +105,7 @@ static int test_alg_vector_free(void) {
         return TEST_FAILED;
 
     alg_vector_free(vec);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -127,6 +135,7 @@ static int test_alg_vector_sort_copy(void) {
 
     alg_vector_free(vec);
     alg_vector_free(sorted_vec);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
@@ -172,6 +181,7 @@ static int test_alg_vector_slice(void) {
     }
     alg_vector_free(vec);
     alg_vector_free(sliced_vec);
+    check_memory_leaks();
     return TEST_PASSED;
 }
 // Test: Concatenate two vectors (right and left concat)
@@ -220,12 +230,14 @@ static int test_alg_vector_concat_inplace(void) {
     // Free the vectors
     alg_vector_free(vec1);
     alg_vector_free(vec2);
-
+    check_memory_leaks();
     return TEST_PASSED;
 }
 
 // Main function to run all tests
 int TEST_MAIN(void) {
+    alg_memalloc_hook hook = {debug_malloc, debug_free, debug_realloc, debug_calloc};
+    alg_memalloc_init(&hook);
     TEST_SCOPE_NEGIN = {INSERT_TEST(test_alg_vector_create),  INSERT_TEST(test_alg_vector_get_val),
                         INSERT_TEST(test_alg_vector_set_val), INSERT_TEST(test_alg_vector_insert),
                         INSERT_TEST(test_alg_vector_free),    INSERT_TEST(test_alg_vector_sort_copy),

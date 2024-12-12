@@ -96,22 +96,10 @@ typedef struct __alg_matrix alg_matrix;
 #endif
 
 typedef struct {
-#if defined(__linux__)
-    void *(*alg_memalloc_malloc)(unsigned long);
+    void *(*alg_memalloc_malloc)(size_t);
     void (*alg_memalloc_free)(void *);
-    void *(*alg_memalloc_realloc)(void *, unsigned long);
-    void *(*alg_memalloc_calloc)(unsigned long, unsigned long);
-#elif defined(_WIN32)
-    void *(*alg_memalloc_malloc)(unsigned long long);
-    void (*alg_memalloc_free)(void *);
-    void *(*alg_memalloc_realloc)(void *, unsigned long long);
-    void *(*alg_memalloc_calloc)(unsigned long long, unsigned long long);
-#else
-    void *(*alg_memalloc_malloc)(unsigned long long);
-    void (*alg_memalloc_free)(void *);
-    void *(*alg_memalloc_realloc)(void *, unsigned long long);
-    void *(*alg_memalloc_calloc)(unsigned long long, unsigned long long);
-#endif
+    void *(*alg_memalloc_realloc)(void *, size_t);
+    void *(*alg_memalloc_calloc)(size_t, size_t);
 } alg_memalloc_hook;
 
 #define FLOAT_COMPARE_IS(val1, val2) (fabs(val1 - val2) < 1e-9)
