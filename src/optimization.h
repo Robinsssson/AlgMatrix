@@ -27,6 +27,6 @@ enum optimization_method {
     DE   // 差分进化算法
 };
 
-void optimization(enum optimization_method method);
+void optimization(enum optimization_method method, ...);
 
 #endif
