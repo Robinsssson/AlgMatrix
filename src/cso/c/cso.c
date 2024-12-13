@@ -33,7 +33,7 @@ cso_handle *cso_init(int pop_size, int dim, double llim, double rlim, optimizati
     return handle;
 }
 
-alg_state cso_fresh(cso_handle *handle) {
+alg_state cso_fresh(cso_handle *handle, int gen) {
     for (int i = 0; i < handle->pop_size; i++) {
         int leader = alg_random_int(0, handle->pop_size);
         int follower = alg_random_int(0, handle->pop_size);

@@ -35,6 +35,11 @@ struct __alg_matrix {
     alg_val_type mat[]; // 一维数组存储矩阵数据
 };
 
+typedef enum {
+    SET_ROW,
+    SET_COL,
+} matrix_type;
+
 struct __alg_vector {
     int size;
     int caps;

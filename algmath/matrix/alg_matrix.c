@@ -11,7 +11,7 @@ alg_matrix *alg_matrix_create(int row, int col) {
         ERROR("ERROR IN CREATE MATRIX WITH NAGETIVE ROW OR COL");
         return NULL;
     }
-    alg_matrix *mat = ALG_MALLOC(sizeof(alg_matrix) + sizeof(alg_val_type) * (unsigned)row * (unsigned)col);
+    alg_matrix *mat = ALG_MALLOC(sizeof(alg_matrix) + sizeof(alg_val_type) * (size_t)row * (size_t)col);
     if (mat == NULL)
         return NULL;
 
@@ -339,6 +339,26 @@ void alg_matrix_fill_random(alg_matrix *matrix, double min_val, double max_val) 
     }
 }
 
+void alg_matrix_fill_random_vecs(alg_matrix *matrix, alg_vector *l_range, alg_vector *r_range, matrix_type type) {
+    // 如果矩阵为空，直接返回
+    if (matrix == NULL)
+        return;
+    double alg_random_float64(double min, double max);
+    if (type == SET_ROW) {
+        for (int i = 0; i < matrix->row; i++) {
+            for (int j = 0; j < matrix->col; j++) {
+                alg_matrix_set_val(matrix, i, j, alg_random_float64(l_range->vector[j], r_range->vector[j]));
+            }
+        }
+    } else if (type == SET_COL) {
+        for (int j = 0; j < matrix->col; j++) {
+            for (int i = 0; i < matrix->row; i++) {
+                alg_matrix_set_val(matrix, i, j, alg_random_float64(l_range->vector[i], r_range->vector[i]));
+            }
+        }
+    }
+}
+
 void alg_matrix_clamp(alg_matrix *matrix, double min_val, double max_val) {
     // 如果矩阵为空，直接返回
     if (matrix == NULL)
@@ -352,6 +372,29 @@ void alg_matrix_clamp(alg_matrix *matrix, double min_val, double max_val) {
             matrix->mat[i] = min_val;
         else if (matrix->mat[i] > max_val)
             matrix->mat[i] = max_val;
+    }
+}
+
+void alg_matrix_clamp_vecs(alg_matrix *matrix, alg_vector *l_range, alg_vector *r_range, matrix_type type) {
+    // 如果矩阵为空，直接返回
+    if (matrix == NULL)
+        return;
+    if (type == SET_ROW) {
+        for (int i = 0; i < matrix->row; i++) {
+            for (int j = 0; j < matrix->col; j++) {
+                alg_matrix_set_val(
+                    matrix, i, j,
+                    MATH_CLAIM(*alg_matrix_get_pos_val(matrix, i, j), l_range->vector[j], r_range->vector[j]));
+            }
+        }
+    } else if (type == SET_ROW) {
+        for (int j = 0; j < matrix->col; j++) {
+            for (int i = 0; i < matrix->row; i++) {
+                alg_matrix_set_val(
+                    matrix, i, j,
+                    MATH_CLAIM(*alg_matrix_get_pos_val(matrix, i, j), l_range->vector[i], r_range->vector[i]));
+            }
+        }
     }
 }
 

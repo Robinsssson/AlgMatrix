@@ -127,6 +127,9 @@ ALG_MATH_API alg_state alg_vector_concat_inplace(alg_vector **ptr_dest_vector, c
 ALG_MATH_API alg_val_type alg_vector_sum(const alg_vector *vec);
 
 ALG_MATH_API alg_state alg_vector_claim(alg_vector *vec, alg_val_type l_range, alg_val_type r_range);
+
+ALG_MATH_API alg_state alg_vector_claim_vecs(alg_vector *vec, alg_vector *l_range, alg_vector *r_range);
+
 #ifdef __cplusplus
 }
 #endif

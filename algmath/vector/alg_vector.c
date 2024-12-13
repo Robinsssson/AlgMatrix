@@ -121,7 +121,7 @@ char *alg_vector_print_str(const alg_vector *vector) {
         if (i != vector->size - 1)
             pos += (size_t)snprintf(str + pos, buf_size - pos, " ");
     }
-    pos += (size_t)snprintf(str + pos, buf_size - pos, "]\n");
+    pos += (size_t)snprintf(str + pos, buf_size - pos, "]");
     return str;
 }
 
@@ -312,6 +312,13 @@ alg_val_type alg_vector_sum(const alg_vector *vec) {
 alg_state alg_vector_claim(alg_vector *vec, alg_val_type l_range, alg_val_type r_range) {
     for (int i = 0; i < vec->size; i++) {
         vec->vector[i] = MATH_CLAIM(vec->vector[i], l_range, r_range);
+    }
+    return ALG_OK;
+}
+
+alg_state alg_vector_claim_vecs(alg_vector *vec, alg_vector *l_range, alg_vector *r_range) {
+    for (int i = 0; i < vec->size; i++) {
+        vec->vector[i] = MATH_CLAIM(vec->vector[i], l_range->vector[i], r_range->vector[i]);
     }
     return ALG_OK;
 }

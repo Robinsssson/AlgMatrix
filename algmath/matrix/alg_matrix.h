@@ -211,7 +211,7 @@ ALG_MATH_API void alg_matrix_fill_random(alg_matrix *matrix, double min_val, dou
  * @param max_val 元素的最大值
  */
 ALG_MATH_API void alg_matrix_clamp(alg_matrix *matrix, double min_val, double max_val);
-
+ALG_MATH_API void alg_matrix_clamp_vecs(alg_matrix *matrix, alg_vector *l_range, alg_vector *r_range, matrix_type type);
 enum alg_matrix_concat {
     CONCAT_AXIS_LX,
     CONCAT_AXIS_RX,
@@ -220,6 +220,7 @@ enum alg_matrix_concat {
 };
 
 ALG_MATH_API alg_state alg_matrix_concat(alg_matrix **dest_matrix, alg_matrix *src_matrix, enum alg_matrix_concat);
+ALG_MATH_API void alg_matrix_fill_random_vecs(alg_matrix *matrix, alg_vector *l_range, alg_vector *r_range, matrix_type type);
 #ifdef __cplusplus
 }
 #endif

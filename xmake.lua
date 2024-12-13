@@ -11,7 +11,7 @@ end
 
 target("pso")
     set_kind("binary")
-    add_files("src/pso/c/*.c")
+    add_files("src/pso/c/*.c", "src/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
     add_cflags(
@@ -24,7 +24,7 @@ target("pso")
 
 target("ga")
     set_kind("binary")
-    add_files("src/ga/c/*.c")
+    add_files("src/ga/c/*.c", "src/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
     add_cflags(
@@ -37,7 +37,7 @@ target("ga")
 
 target("abc")
     set_kind("binary")
-    add_files("src/abc/c/*.c")
+    add_files("src/abc/c/*.c", "src/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
     add_cflags(
@@ -49,7 +49,7 @@ target("abc")
 
 target("aco")
     set_kind("binary")
-    add_files("src/aco/c/*.c")
+    add_files("src/aco/c/*.c", "src/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
     add_cflags(
@@ -61,7 +61,7 @@ target("aco")
 
 target("aia")
     set_kind("binary")
-    add_files("src/aia/c/*.c")
+    add_files("src/aia/c/*.c", "src/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
     add_cflags(
@@ -73,7 +73,7 @@ target("aia")
 
 target("sa")
     set_kind("binary")
-    add_files("src/sa/c/*.c")
+    add_files("src/sa/c/*.c", "src/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
     add_cflags(
@@ -85,7 +85,7 @@ target("sa")
 
 target("eda")
     set_kind("binary")
-    add_files("src/eda/c/*.c")
+    add_files("src/eda/c/*.c", "src/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
     add_cflags(
@@ -97,7 +97,19 @@ target("eda")
 
 target("de")
     set_kind("binary")
-    add_files("src/de/c/*.c")
+    add_files("src/de/c/*.c", "src/*.c")
+    add_deps("algmath")
+    add_includedirs("algmath")
+    add_cflags(
+        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
+        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
+        "-Wstrict-prototypes", "-Wmissing-prototypes", 
+        "-Wredundant-decls"
+    )
+
+target("cs")
+    set_kind("binary")
+    add_files("src/cs/c/*.c", "src/*.c")
     add_deps("algmath")
     add_includedirs("algmath")
     add_cflags(
