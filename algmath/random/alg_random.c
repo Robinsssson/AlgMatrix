@@ -68,3 +68,11 @@ alg_state alg_random_sample_unique(int range_l, int range_r, int number, int *re
     free(temp_array); // 释放临时数组
     return ALG_OK;
 }
+
+int alg_random_except_int(int left, int right, int except) {
+    int index;
+    do {
+        index = alg_random_int(left, right);
+    } while (except == index);
+    return index;
+}

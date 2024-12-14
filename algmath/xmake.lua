@@ -14,12 +14,10 @@ target("algmath")
         "-Wstrict-prototypes", "-Wmissing-prototypes", 
         "-Wredundant-decls"
     )
- 
-
 
 target("test-algmath-vector")
     set_kind("binary")
-    add_files("test/alg_vector_test.c", "test/test_framework.c", "test/debug_memory.c")
+    add_files("test/test_alg_vector.c", "test/test_framework.c", "test/debug_memory.c")
     add_deps("algmath")
     add_includedirs(".")
     add_cflags(
@@ -31,7 +29,7 @@ target("test-algmath-vector")
 
 target("test-algmath-matrix")
     set_kind("binary")
-    add_files("test/alg_matrix_test.c", "test/test_framework.c", "test/debug_memory.c")
+    add_files("test/test_alg_matrix.c", "test/test_framework.c", "test/debug_memory.c")
     add_deps("algmath")
     add_includedirs(".")
     add_cflags(
