@@ -1,12 +1,11 @@
 #include "cso.h"
 
 static double test_function(alg_vector *vec) {
-    // 确保向量的大小为2（二维空间）
     double ret = 0.f;
     for (int i = 0; i < vec->size; i++) {
         ret += pow(vec->vector[i], 2);
     }
-    return ret;
+    return ret + 2;
 }
 #define VAL(v) v
 #define VS 50.
@@ -15,9 +14,9 @@ int main(void) {
     double l_range[] = {-VAL(VS), -VAL(VS), -VAL(VS), -VAL(VS), -VAL(VS), -VAL(VS)},
            r_range[] = {VAL(VS), VAL(VS), VAL(VS), VAL(VS), VAL(VS), VAL(VS)};
     optim_init(&optim, 6, test_function, l_range, r_range);
-    cso_handle *handle = cso_init(optim, 150, 0.01, 0.25, 1.5);
+    cso_handle *handle = cso_init(optim, 210, 30, 60, 120, 1);
     for (int i = 0; i < 50; i++) {
-        cso_fresh(handle, 20);
+        cso_fresh(handle, 1);
         optim_print(&handle->optim);
     }
     cso_free(handle);

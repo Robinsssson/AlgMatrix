@@ -508,3 +508,19 @@ alg_state alg_matrix_concat(alg_matrix **dest_matrix, alg_matrix *src_matrix, en
     alg_matrix_free(copy_matrix);
     return ALG_OK;
 }
+
+alg_state alg_matrix_get_row(const alg_matrix *mat, alg_vector *vecs, int index) {
+    if (mat->col != vecs->size || mat == NULL || vecs == NULL)
+        return ALG_ERROR;
+    for (int i = 0; i < mat->col; i++)
+        vecs->vector[i] = *alg_matrix_get_pos_val(mat, index, i);
+    return ALG_OK;
+}
+
+alg_state alg_matrix_get_col(const alg_matrix *mat, alg_vector *vecs, int index) {
+    if (mat->row != vecs->size || mat == NULL || vecs == NULL)
+        return ALG_ERROR;
+    for (int i = 0; i < mat->row; i++)
+        vecs->vector[i] = *alg_matrix_get_pos_val(mat, i, index);
+    return ALG_OK;
+}

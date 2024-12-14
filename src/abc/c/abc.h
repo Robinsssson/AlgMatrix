@@ -4,15 +4,9 @@
 #include "../../basic_opti.h"
 
 typedef struct {
-    int food_number;
-    int dim;
-    double lower_bound, upper_bound;
-    int limit;
-    alg_matrix *food_matrix;
-    optimization function;
-    alg_matrix *employed_bees, *onlooker_bees;
-    alg_vector *fitness;
-    int trial[];
+    optim_handle optim;
+    int pop_size;
+    
 } abc_handle;
 
 abc_handle *abc_init(int food_number, int dimension, double lower_bound, double upper_bound, int limit,

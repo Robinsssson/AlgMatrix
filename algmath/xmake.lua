@@ -1,12 +1,13 @@
+if is_plat("windows") then
+    set_toolchains("gcc")
+else 
+    set_toolchains("gcc")
+end
+
 target("algmath")
     set_kind("shared")
     add_files("**.c|test/*.c")
     add_defines("ALG_EXPORT")
-    if is_plat("windows") then
-        set_toolchains("gcc")
-    else 
-        set_toolchains("gcc")
-    end
     add_cflags(
         "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
         "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
@@ -21,11 +22,6 @@ target("test-algmath-vector")
     add_files("test/alg_vector_test.c", "test/test_framework.c", "test/debug_memory.c")
     add_deps("algmath")
     add_includedirs(".")
-    if is_plat("windows") then
-        set_toolchains("gcc")
-    else 
-        set_toolchains("gcc")
-    end 
     add_cflags(
         "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
         "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
@@ -38,11 +34,6 @@ target("test-algmath-matrix")
     add_files("test/alg_matrix_test.c", "test/test_framework.c", "test/debug_memory.c")
     add_deps("algmath")
     add_includedirs(".")
-    if is_plat("windows") then
-        set_toolchains("gcc")
-    else 
-        set_toolchains("gcc")
-    end 
     add_cflags(
         "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
         "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 

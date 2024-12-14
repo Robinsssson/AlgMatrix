@@ -184,6 +184,8 @@ ALG_MATH_API alg_matrix *alg_matrix_transpose(alg_matrix *mat);
  */
 ALG_MATH_API alg_state alg_matrix_transpose_inplace(alg_matrix *mat);
 
+ALG_MATH_API alg_state alg_matrix_get_row(const alg_matrix* mat, alg_vector* vecs, int index);
+ALG_MATH_API alg_state alg_matrix_get_col(const alg_matrix* mat, alg_vector* vecs, int index);
 /**
  * @brief 设置矩阵的某一行
  *

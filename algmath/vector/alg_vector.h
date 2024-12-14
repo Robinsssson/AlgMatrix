@@ -85,7 +85,7 @@ ALG_MATH_API char *alg_vector_print_str(const alg_vector *vector);
  * @param ptr_compare 在"alg_utils.h"中定义的函数
  * @return char* 指向创建的向量对象的指针，失败时返回 NULL
  */
-alg_state alg_vector_sort_copy(alg_vector *dest_vector, const alg_vector *src_vector, int *sort_index,
+ALG_MATH_API alg_state alg_vector_sort_copy(alg_vector *dest_vector, const alg_vector *src_vector, int *sort_index,
                                int (*ptr_compare)(const void *, const void *));
 
 ALG_MATH_API alg_state alg_vector_sort_inplace(alg_vector *src_vector, int *sort_index, alg_boolean change_flag,
