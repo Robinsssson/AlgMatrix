@@ -1,6 +1,7 @@
 #ifndef __AIA_H
 #define __AIA_H
-#include "../../basic_opti.h"
+
+#include "../basic_opti.h"
 
 typedef struct {
     int clone_factor, num_antibodies;

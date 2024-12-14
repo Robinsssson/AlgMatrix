@@ -4,7 +4,7 @@ static double sphere_function(alg_vector *vec) {
     for (int i = 0; i < vec->size; i++) {
         ret += pow(vec->vector[i], 2);
     }
-    return ret;
+    return ret + 2;
 }
 
 static double rosenbrock(alg_vector *vec) {

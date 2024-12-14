@@ -1,7 +1,7 @@
 #ifndef __ABC_H
 #define __ABC_H
 
-#include "../../basic_opti.h"
+#include "../basic_opti.h"
 
 typedef struct {
     optim_handle optim;

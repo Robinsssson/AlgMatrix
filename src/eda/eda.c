@@ -1,5 +1,6 @@
 #include "eda.h"
 #include "alg_inc.h"
+#include "math/alg_math.h"
 #include "matrix/alg_matrix.h"
 #include "memalloc/alg_memalloc.h"
 #include "random/alg_random.h"
@@ -42,12 +43,13 @@ alg_state eda_fresh(eda_handle *handle, int gen) {
     double mean[handle->optim.dim];
     int sorted_index[handle->pop_size];
     double std[handle->optim.dim];
+    int elite_count = (int)round(handle->elitism_rate * handle->pop_size);
+    alg_matrix *elites = alg_matrix_create(elite_count, handle->optim.dim);
+    alg_vector *sorted_fitness = alg_vector_create_like(handle->fitness);
     for (int __iter = 0; __iter < gen; __iter++) {
 
-        alg_vector *sorted_fitness = alg_vector_create_like(handle->fitness);
         alg_vector_sort_copy(sorted_fitness, handle->fitness, sorted_index, alg_utils_greater);
-        int elite_count = (int)round(handle->elitism_rate * handle->pop_size);
-        alg_matrix *elites = alg_matrix_create(elite_count, handle->optim.dim);
+
         for (int i = 0; i < elite_count; i++) {
             for (int j = 0; j < handle->optim.dim; j++) {
                 alg_matrix_set_val(elites, i, j, *alg_matrix_get_pos_val(handle->population, sorted_index[i], j));
@@ -59,7 +61,7 @@ alg_state eda_fresh(eda_handle *handle, int gen) {
             for (int j = 0; j < elite_count; j++) {
                 mean[i] += *alg_matrix_get_pos_val(elites, j, i);
             }
-            mean[i] /= elite_count;
+            mean[i] = alg_math_safe_divide(mean[i], elite_count + 1e-9);
         }
 
         for (int i = 0; i < handle->optim.dim; i++) {
@@ -67,23 +69,21 @@ alg_state eda_fresh(eda_handle *handle, int gen) {
             for (int j = 0; j < elite_count; j++) {
                 std[i] += pow(*alg_matrix_get_pos_val(elites, j, i) - mean[i], 2);
             }
-            std[i] /= elite_count;
+            std[i] = alg_math_safe_divide(std[i], elite_count + 1e-9);
             std[i] = sqrt(std[i]);
         }
-        
+
         for (int i = 0; i < handle->pop_size; i++) {
             for (int j = 0; j < handle->optim.dim; j++) {
                 alg_matrix_set_val(handle->population, i, j, alg_random_normal(mean[j], std[j]));
             }
         }
 
-        alg_matrix_fill_random_vecs(handle->population, handle->optim.l_range, handle->optim.r_range, SET_ROW);
-
+        alg_matrix_clamp_vecs(handle->population, handle->optim.l_range, handle->optim.r_range, SET_ROW);
         optim_fresh(&handle->optim, handle->population, handle->fitness);
-        alg_matrix_free(elites);
-        alg_vector_free(sorted_fitness);
     }
-
+    alg_vector_free(sorted_fitness);
+    alg_matrix_free(elites);
     return ALG_OK;
 }
 

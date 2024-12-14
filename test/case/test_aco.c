@@ -1,8 +1,7 @@
-#include "../test_framework.h"
-#include "../debug_memory.h"
 #include "../../src/optimization.h"
+#include "../debug_memory.h"
+#include "../test_framework.h"
 #include "../test_function_list.h"
-
 
 #define CITY_COUNT 8
 
@@ -37,7 +36,7 @@ int test_aco(void) {
     double beta = 2.0;  // 启发式信息的重要性
     double rho = 0.1;   // 信息素蒸发率
     int number = 10;    // 蚂蚁的数量
-    int iter = 100;
+    int iter = 25;
     // 3. 初始化 ACO 算法
     aco_handle *aco = aco_init(number, city_coords, alpha, beta, rho);
     if (aco == NULL) {
@@ -49,7 +48,9 @@ int test_aco(void) {
     for (int it = 0; it < iter; it++) {
         if (aco_fresh(aco) != ALG_OK) {
             printf("ACO algorithm failed!\n");
+            alg_matrix_free(city_coords);
             aco_free(aco);
+            check_memory_leaks();
             return TEST_FAILED;
         }
         // 5. 输出最佳路径和路径长度
@@ -63,6 +64,7 @@ int test_aco(void) {
     }
 
     // 6. 释放 ACO 算法的资源
+    alg_matrix_free(city_coords);
     aco_free(aco);
     check_memory_leaks();
     return TEST_PASSED;

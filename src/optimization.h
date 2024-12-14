@@ -16,16 +16,16 @@
 
 #include "basic_opti.h"
 
-#include "abc/c/abc.h"
-#include "aco/c/aco.h"
-#include "aia/c/aia.h"
-#include "cs/c/cs.h"
-#include "cso/c/cso.h"
-#include "de/c/de.h"
-#include "eda/c/eda.h"
-#include "ga/c/ga.h"
-#include "pso/c/pso.h"
-#include "sa/c/sa.h"
+#include "abc/abc.h"
+#include "aco/aco.h"
+#include "aia/aia.h"
+#include "cs/cs.h"
+#include "cso/cso.h"
+#include "de/de.h"
+#include "eda/eda.h"
+#include "ga/ga.h"
+#include "pso/pso.h"
+#include "sa/sa.h"
 
 enum optimization_method {
     GA,  // 遗传算法

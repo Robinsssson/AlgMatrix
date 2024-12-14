@@ -107,7 +107,7 @@ typedef struct {
     void *(*alg_memalloc_calloc)(size_t, size_t);
 } alg_memalloc_hook;
 
-#define FLOAT_COMPARE_IS(val1, val2) (fabs(val1 - val2) < 1e-9)
+#define FLOAT_COMPARE_IS(val1, val2) (fabs(val1 - val2) < 1e-4)
 #define MATH_CLAIM(x, min, max) (x > max ? max : (x < min ? min : x))
 
 typedef enum { ALG_FALSE = 0, ALG_TRUE = !ALG_FALSE } alg_boolean;

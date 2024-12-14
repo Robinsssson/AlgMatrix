@@ -115,6 +115,8 @@ alg_state cs_fresh(cs_handle *handle, int gen) {
     }
     alg_vector_free(new_solve);
     alg_vector_free(cache_solve);
+    alg_vector_free(m_solve);
+    alg_vector_free(n_solve);
     return ALG_OK;
 }
 

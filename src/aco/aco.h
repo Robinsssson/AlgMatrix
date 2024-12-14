@@ -1,7 +1,7 @@
 #ifndef __ACO_H
 #define __ACO_H
 
-#include "../../basic_opti.h"
+#include "../basic_opti.h"
 
 typedef struct {
     alg_matrix *city_coords;

@@ -1,7 +1,7 @@
 #ifndef __DE_H
 #define __DE_H
 
-#include "../../basic_opti.h"
+#include "../basic_opti.h"
 
 typedef struct {
     int pop_size;

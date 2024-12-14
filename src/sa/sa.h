@@ -1,7 +1,7 @@
 #ifndef __SA_H
 #define __SA_H
 
-#include "../../basic_opti.h"
+#include "../basic_opti.h"
 
 typedef struct {
     optim_handle optim;

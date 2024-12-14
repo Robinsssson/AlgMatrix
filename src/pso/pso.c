@@ -14,6 +14,7 @@ static void pso_free_internal(pso_handle *handle) {
     alg_matrix_free(handle->p_best);
     alg_matrix_free(handle->position);
     alg_matrix_free(handle->vec);
+    alg_vector_free(handle->fitness);
     ALG_FREE(handle->p_best_fitness);
 }
 
@@ -112,8 +113,10 @@ alg_state pso_fresh(pso_handle *handle, int gen) {
         alg_matrix_clamp(handle->vec, -1, 1);
         alg_matrix_add_inplace(handle->position, handle->vec);
         alg_matrix_clamp_vecs(handle->position, handle->optim.l_range, handle->optim.r_range, SET_ROW);
+
         alg_matrix_free(sub1);
         alg_matrix_free(sub2);
+
         optim_fresh(&handle->optim, handle->position, handle->fitness);
     }
     alg_vector_free(best_position);
@@ -123,7 +126,6 @@ alg_state pso_fresh(pso_handle *handle, int gen) {
 
 alg_state pso_free(pso_handle *handle) {
     pso_free_internal(handle);
-    ALG_FREE(handle->p_best_fitness);
     ALG_FREE(handle);
     return ALG_OK;
 }

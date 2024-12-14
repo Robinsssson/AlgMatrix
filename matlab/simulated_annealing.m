@@ -1,8 +1,8 @@
 function simulated_annealing()
     % 定义参数
     dim = 2; % 维度数
-    max_iterations = 1000; % 最大迭代次数
-    initial_temperature = 100; % 初始温度
+    max_iterations = 10000; % 最大迭代次数
+    initial_temperature = 1000; % 初始温度
     cooling_rate = 0.99; % 温度下降速率
     lower_bound = -10; % 搜索空间下界
     upper_bound = 10; % 搜索空间上界

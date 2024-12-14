@@ -42,7 +42,7 @@ alg_state sa_fresh(sa_handle *handle, int gen) {
         double new_energy = handle->optim.function(handle->new_solution);
 
         if (new_energy < handle->current_energy
-            || exp(alg_math_safe_divide(handle->current_energy - new_energy, handle->temperature))
+            || exp(alg_math_safe_divide(handle->current_energy - new_energy, handle->temperature + 1e-6))
                    > alg_random_float64(0, 1)) {
             handle->current_energy = new_energy;
             for (int i = 0; i < handle->optim.dim; i++)
@@ -55,6 +55,7 @@ alg_state sa_fresh(sa_handle *handle, int gen) {
                 handle->best_solution->vector[i] = handle->current_solution->vector[i];
         }
         handle->temperature *= handle->cooling_rate;
+        handle->temperature = handle->temperature > 1 ? handle->temperature : 1;
         sa_fresh_best_solution(handle);
     }
     return ALG_OK;

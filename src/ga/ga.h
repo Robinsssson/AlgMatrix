@@ -1,7 +1,7 @@
 #ifndef __GA_H
 #define __GA_H
 
-#include "../../basic_opti.h"
+#include "../basic_opti.h"
 
 typedef struct {
     optim_handle optim;

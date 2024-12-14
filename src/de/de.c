@@ -31,7 +31,7 @@ static alg_state get_from_index(const alg_matrix *mat, double *arr, int length, 
 de_handle *de_init(optim_handle optim, int pop_size, double f, double cr) {
     de_handle *handle = ALG_MALLOC(sizeof(de_handle));
     handle->fitness = alg_vector_create(pop_size, INFINITY);
-    handle->population = alg_matrix_create(pop_size, handle->optim.dim);
+    handle->population = alg_matrix_create(pop_size, optim.dim);
     handle->optim = optim;
     alg_matrix_fill_random_vecs(handle->population, handle->optim.l_range, handle->optim.r_range, SET_ROW);
     handle->pop_size = pop_size;
@@ -77,6 +77,7 @@ alg_state de_fresh(de_handle *handle, int gen) {
                 handle->fitness->vector[i] = u_fitness;
             }
         }
+        optim_fresh(&handle->optim, handle->population, handle->fitness);
     }
     alg_vector_free(u);
     return ALG_OK;

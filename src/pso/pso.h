@@ -1,7 +1,7 @@
 #ifndef __PSO__H__
 #define __PSO__H__
 
-#include "../../basic_opti.h"
+#include "../basic_opti.h"
 
 typedef struct {
     optim_handle optim;

@@ -1,6 +1,7 @@
 #include "ga.h"
 #include "alg_inc.h"
 #include "matrix/alg_matrix.h"
+#include "vector/alg_vector.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -141,7 +142,9 @@ static alg_state generate_new_population(ga_handle *handle) {
 
     // 用于存放子代的数组
     alg_vector *child_list[2 * number_parents];
-
+     for (int i = 0; i < 2 * number_parents; i ++) {
+        child_list[i] = NULL;
+    }
     // 开始交叉并生成子代
     for (int i = 0; i < number_parents; i += 2) {
         // 从种群中选择两个父代
@@ -190,6 +193,9 @@ static alg_state generate_new_population(ga_handle *handle) {
 
     // 替换旧种群为新种群
     alg_matrix_free(handle->population);
+    for (int i = 0; i < 2 * number_parents; i ++) {
+        alg_vector_free(child_list[i]);
+    }
     handle->population = new_population;
     handle->pop_size = handle->population->row;
     return ALG_OK;

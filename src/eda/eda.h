@@ -1,7 +1,7 @@
 #ifndef __EDA_H
 #define __EDA_H
 
-#include "../../basic_opti.h"
+#include "../basic_opti.h"
 
 typedef struct {
     optim_handle optim;

@@ -1,7 +1,7 @@
 #ifndef CSO_H
 #define CSO_H
 
-#include "../../basic_opti.h"
+#include "../basic_opti.h"
 
 // 定义CSO句柄
 typedef struct {
