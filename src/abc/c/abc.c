@@ -4,156 +4,83 @@
 #include "memalloc/alg_memalloc.h"
 #include "random/alg_random.h"
 #include "vector/alg_vector.h"
-#include <math.h>
-#include <stdio.h>
-#include <time.h>
+#include <corecrt.h>
 
-static void abc_fresh_fitness(abc_handle *handle);
-
-abc_handle *abc_init(int food_number, int dimension, double lower_bound, double upper_bound, int limit,
-                     optimization function) {
-    abc_handle *handle = ALG_MALLOC(sizeof(abc_handle) + sizeof(int) * (size_t)(food_number));
-    if (handle == NULL) {
-        ERROR("HANDLE INIT ERROR");
-        return NULL;
-    }
-    handle->food_number = food_number;
-    handle->lower_bound = lower_bound;
-    handle->upper_bound = upper_bound;
-    handle->limit = limit;
-    handle->function = function;
-
-    handle->food_matrix = alg_matrix_create(food_number, dimension);
-    if (handle->food_matrix == NULL) {
-        ERROR("INIT FOOD_MATRIX ERROR");
-        ALG_FREE(handle);
-        return NULL;
-    }
-    alg_matrix_fill_random(handle->food_matrix, lower_bound, upper_bound);
-
-    handle->fitness = alg_vector_create(food_number, 0.0);
-    if (handle->fitness == NULL) {
-    }
-    abc_fresh_fitness(handle);
-
-    handle->employed_bees = alg_matrix_copy(handle->food_matrix);
-    handle->onlooker_bees = alg_matrix_copy(handle->food_matrix);
-
-    for (int i = 0; i < food_number; i++) {
-        handle->trial[i] = 0;
-    }
-
+abc_handle *abc_init(optim_handle optim, int pop_size, int max_count) {
+    abc_handle *handle = ALG_MALLOC(sizeof(abc_handle));
+    handle->optim = optim;
+    handle->pop_size = pop_size;
+    handle->population = alg_matrix_create(pop_size, optim.dim);
+    handle->fitness = alg_vector_create(pop_size, 0.0);
+    handle->count = ALG_CALLOC((size_t)pop_size, sizeof(int));
+    handle->max_count = max_count;
+    alg_matrix_fill_random_vecs(handle->population, optim.l_range, optim.r_range, SET_ROW);
+    optim_fresh(&handle->optim, handle->population, handle->fitness);
     return handle;
 }
 
-static void abc_fresh_fitness(abc_handle *handle) {
-    for (int i = 0; i < handle->food_number; i++) {
-        alg_vector *tmp_vector = alg_vector_from_matrix_row(handle->food_matrix, i);
-        alg_vector_set_val(handle->fitness, i, handle->function(tmp_vector));
-        alg_vector_free(tmp_vector);
-    }
-}
-static void search_new_food(abc_handle *handle, alg_vector *current_food) {
-    alg_vector *step = alg_vector_create(handle->dim, 0.0);
-    if (step == NULL) {
-        ERROR("PHI INIT ERROR");
-        return;
-    }
-    for (int i = 0; i < handle->dim; i++) {
-        double current_val = *alg_vector_get_val(current_food, i);
-        alg_vector_set_val(step, i,
-                           alg_random_float64(handle->lower_bound - current_val, current_val - handle->lower_bound));
-        alg_vector_set_val(current_food, i, *alg_vector_get_val(step, i));
-    }
-    alg_vector_free(step);
-}
+alg_state abc_fresh(abc_handle *handle, int gen) {
+    alg_vector *cache_vec = alg_vector_create(handle->optim.dim, 0.0),
+               *r_cache_vec = alg_vector_create(handle->optim.dim, 0.0),
+               *copy_fitness = alg_vector_create_like(handle->fitness);
+    for (int __iter = 0; __iter < gen; __iter++) {
+        for (int pop = 0; pop < handle->pop_size; pop++) {
+            alg_matrix_get_row(handle->population, cache_vec, pop);
+            double cache_fitness = handle->optim.function(cache_vec);
 
-static double alg_safe_divide(double numerator, double denominator) {
-    if (fabs(denominator) < 1e-9) {
-        // 除数为零，返回 NaN (Not a Number)
-        ERROR("Division by zero!");
-        return NAN; // 返回 NaN，表示无效的结果
-    }
-    return numerator / denominator; // 正常除法
-}
-
-int abc_get_best_solution(abc_handle *handle) {
-    int index = 0;
-    double fit = *alg_vector_get_val(handle->fitness, 0), fit_iterval;
-    for (int i = 1; i < handle->food_number; i++) {
-        fit_iterval = *alg_vector_get_val(handle->fitness, i);
-        if (fit > fit_iterval) {
-            fit = fit_iterval;
-            index = i;
-        }
-    }
-    alg_vector *best_vec = alg_vector_from_matrix_row(handle->food_matrix, index);
-    char *strs = alg_vector_print_str(best_vec);
-    printf("Best solve VAL is %.2f, Best SOLVE is %s", fit, strs);
-    ALG_FREE(strs);
-    alg_vector_free(best_vec);
-    return index;
-}
-
-alg_state abc_fresh(abc_handle *handle) {
-    alg_vector *new_food;
-    double sum;
-    double prob;
-    double rand;
-    double new_fitness;
-
-    // 1. 雇佣蜜蜂搜索阶段
-    for (int i = 0; i < handle->food_number; i++) {
-        new_food = alg_vector_from_matrix_row(handle->employed_bees, i);
-        search_new_food(handle, new_food);
-        new_fitness = handle->function(new_food);
-        if (new_fitness < handle->fitness->vector[i]) {
-            // 更新食物源和适应度
-            alg_vector_set_val(handle->fitness, i, new_fitness);
-            for (int iter = 0; iter < handle->dim; iter++) {
-                alg_matrix_set_val(handle->food_matrix, i, iter, *alg_vector_get_val(new_food, iter));
+            int index = alg_random_except_int(0, handle->pop_size, pop);
+            alg_matrix_get_row(handle->population, r_cache_vec, index);
+            for (int dim_iter = 0; dim_iter < handle->optim.dim; dim_iter++) {
+                cache_vec->vector[dim_iter] +=
+                    alg_random_float64(-1, 1) * (cache_vec->vector[dim_iter] - r_cache_vec->vector[dim_iter]);
             }
-        }
-        alg_vector_free(new_food);
-    }
-
-    // 2. 观察者蜜蜂搜索阶段
-    sum = alg_vector_sum(handle->fitness); // 计算适应度的总和
-    for (int i = 0; i < handle->food_number; i++) {
-        prob = alg_safe_divide(handle->fitness->vector[i], sum); // 计算选择该食物源的概率
-        if (__isnan(prob)) {
-            ERROR("GET A NAN VAL");
-            continue;
+            alg_vector_claim_vecs(cache_vec, handle->optim.l_range, handle->optim.r_range);
+            double r_cache_fitness = handle->optim.function(cache_vec);
+            if (r_cache_fitness < cache_fitness) {
+                alg_matrix_set_row(handle->population, pop, cache_vec);
+                handle->count[pop] = 0;
+            } else
+                handle->count[pop] += 1;
         }
 
-        rand = alg_random_float64(0, 1); // 生成一个 0 到 1 之间的随机数
-        if (rand > prob) {
-            // 随机数大于概率值，不选择该食物源，跳过
-            continue;
-        }
+        optim_fresh(&handle->optim, handle->population, handle->fitness);
 
-        // 选择该食物源进行局部搜索
-        new_food = alg_vector_from_matrix_row(handle->onlooker_bees, i);
-        search_new_food(handle, new_food);
-        new_fitness = handle->function(new_food);
-        if (new_fitness < handle->fitness->vector[i]) {
-            // 更新食物源和适应度
-            alg_vector_set_val(handle->fitness, i, new_fitness);
-            for (int iter = 0; iter < handle->dim; iter++) {
-                alg_matrix_set_val(handle->food_matrix, i, iter, *alg_vector_get_val(new_food, iter));
+        double sum = alg_vector_sum(handle->fitness);
+        copy_fitness->vector[0] = handle->fitness->vector[0] / sum;
+        for (int pop = 1; pop < handle->pop_size; pop++) {
+            copy_fitness->vector[pop] = handle->fitness->vector[pop] / sum + copy_fitness->vector[pop - 1];
+        }
+        double select_random = alg_random_float64(0, 1);
+        int selected_index = handle->pop_size - 1;
+        for (int pop = 0; pop < handle->pop_size; pop++) {
+            if (select_random > copy_fitness->vector[pop])
+                continue;
+            selected_index = pop;
+            break;
+        }
+        optim_fresh_best_solution(&handle->optim, handle->population, handle->fitness, selected_index);
+
+        for (int pop = 0; pop < handle->pop_size; pop++) {
+            if (handle->count[pop] < handle->max_count)
+                continue;
+            alg_matrix_get_row(handle->population, cache_vec, pop);
+            for (int dim_iter = 0; dim_iter < handle->optim.dim; dim_iter++) {
+                cache_vec->vector[dim_iter] = alg_random_float64(handle->optim.l_range->vector[dim_iter],
+                                                                 handle->optim.r_range->vector[dim_iter]);
             }
+            handle->count[pop] = 0;
         }
-        alg_vector_free(new_food);
     }
-
+    alg_vector_free(cache_vec);
+    alg_vector_free(r_cache_vec);
+    alg_vector_free(copy_fitness);
     return ALG_OK;
 }
 
 alg_state abc_free(abc_handle *handle) {
-    alg_matrix_free(handle->food_matrix);
-    alg_matrix_free(handle->employed_bees);
-    alg_matrix_free(handle->onlooker_bees);
     alg_vector_free(handle->fitness);
+    alg_matrix_free(handle->population);
+    ALG_FREE(handle->count);
     ALG_FREE(handle);
     return ALG_OK;
 }

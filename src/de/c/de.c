@@ -28,70 +28,57 @@ static alg_state get_from_index(const alg_matrix *mat, double *arr, int length, 
     return ALG_OK;
 }
 
-static alg_state fresh_fitness(de_handle *handle) {
-    alg_vector *vec = alg_vector_create(handle->dim, 0.0);
-    for (int pop = 0; pop < handle->pop_size; pop++) {
-        for (int i = 0; i < handle->dim; i++) {
-            vec->vector[i] = *alg_matrix_get_pos_val(handle->population, pop, i);
-        }
-        handle->fitness->vector[pop] = handle->function(vec);
-    }
-    alg_vector_free(vec);
-    return ALG_OK;
-}
-
-de_handle *de_init(int pop_size, int dim, double llim, double rlim, optimization function, double f, double cr) {
+de_handle *de_init(optim_handle optim, int pop_size, double f, double cr) {
     de_handle *handle = ALG_MALLOC(sizeof(de_handle));
     handle->fitness = alg_vector_create(pop_size, INFINITY);
-    handle->population = alg_matrix_create(pop_size, dim);
-    alg_matrix_fill_random(handle->population, llim, rlim);
+    handle->population = alg_matrix_create(pop_size, handle->optim.dim);
+    handle->optim = optim;
+    alg_matrix_fill_random_vecs(handle->population, handle->optim.l_range, handle->optim.r_range, SET_ROW);
     handle->pop_size = pop_size;
-    handle->dim = dim;
-    handle->llim = llim;
-    handle->rlim = rlim;
-    handle->function = function;
     handle->f = f;
     handle->cr = cr;
-    fresh_fitness(handle);
+    optim_fresh(&handle->optim, handle->population, handle->fitness);
     return handle;
 }
 
-alg_state de_fresh(de_handle *handle) {
+alg_state de_fresh(de_handle *handle, int gen) {
     int idx[3];
     int j_rand;
-    alg_vector *u;
+    alg_vector *u = alg_vector_create(handle->optim.dim, 0.0);
     double u_fitness;
-    double x1[handle->dim], x2[handle->dim], x3[handle->dim], v[handle->dim];
-    for (int i = 0; i < handle->pop_size; i++) {
-        do {
-            alg_random_sample_unique(0, (int)handle->pop_size, 3, idx);
-        } while (check_if(idx, 3, i) == ALG_TRUE);
+    double x1[handle->optim.dim], x2[handle->optim.dim], x3[handle->optim.dim], v[handle->optim.dim];
+    for (int __iter = 0; __iter < gen; __iter++) {
+        for (int i = 0; i < handle->pop_size; i++) {
+            do {
+                alg_random_sample_unique(0, (int)handle->pop_size, 3, idx);
+            } while (check_if(idx, 3, i) == ALG_TRUE);
 
-        if (get_from_index(handle->population, x1, handle->dim, idx[0]) != ALG_OK
-            || get_from_index(handle->population, x2, handle->dim, idx[1]) != ALG_OK
-            || get_from_index(handle->population, x3, handle->dim, idx[2]) != ALG_OK) {
-            return ALG_ERROR;
-        }
+            if (get_from_index(handle->population, x1, handle->optim.dim, idx[0]) != ALG_OK
+                || get_from_index(handle->population, x2, handle->optim.dim, idx[1]) != ALG_OK
+                || get_from_index(handle->population, x3, handle->optim.dim, idx[2]) != ALG_OK) {
+                return ALG_ERROR;
+            }
 
-        for (int i_dim = 0; i_dim < handle->dim; i_dim++)
-            v[i_dim] = x1[i_dim] + handle->f * (x2[i_dim] - x3[i_dim]);
+            for (int i_dim = 0; i_dim < handle->optim.dim; i_dim++)
+                v[i_dim] = x1[i_dim] + handle->f * (x2[i_dim] - x3[i_dim]);
 
-        // 交叉操作
-        u = alg_vector_from_matrix_row(handle->population, i);
-        j_rand = alg_random_int(0, handle->dim);
-        for (int j = 0; j < handle->dim; j++) {
-            if (alg_random_float64(0, 1) <= handle->cr || j == j_rand)
-                alg_vector_set_val(u, j, v[j]);
+            // 交叉操作
+            alg_matrix_get_row(handle->population, u, i);
+            j_rand = alg_random_int(0, handle->optim.dim);
+            for (int j = 0; j < handle->optim.dim; j++) {
+                if (alg_random_float64(0, 1) <= handle->cr || j == j_rand)
+                    alg_vector_set_val(u, j, v[j]);
+            }
+            alg_vector_claim_vecs(u, handle->optim.l_range, handle->optim.r_range);
+            // 选择操作
+            u_fitness = handle->optim.function(u);
+            if (u_fitness < handle->fitness->vector[i]) {
+                alg_matrix_set_row(handle->population, i, u);
+                handle->fitness->vector[i] = u_fitness;
+            }
         }
-        alg_vector_claim(u, handle->llim, handle->rlim);
-        // 选择操作
-        u_fitness = handle->function(u);
-        if (u_fitness < handle->fitness->vector[i]) {
-            alg_matrix_set_row(handle->population, i, u);
-            handle->fitness->vector[i] = u_fitness;
-        }
-        alg_vector_free(u);
     }
+    alg_vector_free(u);
     return ALG_OK;
 }
 

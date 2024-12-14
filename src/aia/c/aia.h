@@ -3,15 +3,14 @@
 #include "../../basic_opti.h"
 
 typedef struct {
-    int clone_factor, dimension, num_antibodies;
-    double llim, rlim, best_fitness, mutation_rate;
+    int clone_factor, num_antibodies;
+    double mutation_rate;
     alg_matrix *population;
-    alg_vector *fitness, *best_solve;
-    optimization function;
+    alg_vector *fitness;
+    optim_handle optim;
 } aia_handle;
 
-aia_handle *aia_init(int num_antibodies, int clone_factor, int dimension, double mutation_rate, double llim,
-                     double rlim, optimization function);
-alg_state aia_fresh(aia_handle *handle);
-void aia_free(aia_handle *handle);
+ALG_MATH_API aia_handle *aia_init(optim_handle optim, int num_antibodies, int clone_factor, double mutation_rate);
+ALG_MATH_API alg_state aia_fresh(aia_handle *handle, int gen);
+ALG_MATH_API alg_state aia_free(aia_handle *handle);
 #endif

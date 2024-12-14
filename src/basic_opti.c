@@ -22,6 +22,7 @@ alg_state optim_init(optim_handle *handle, int dim, optimization function, doubl
 alg_state optim_free(optim_handle *handle) {
     alg_vector_free(handle->l_range);
     alg_vector_free(handle->r_range);
+    alg_vector_free(handle->best_solution);
     return ALG_OK;
 }
 
@@ -34,10 +35,15 @@ alg_state optim_fresh(optim_handle *handle, alg_matrix *population, alg_vector *
         fitness->vector[i] = handle->function(tmp);
     }
     int index = alg_vector_compare_val(fitness, alg_utils_greater);
+    optim_fresh_best_solution(handle, population, fitness, index);
+    alg_vector_free(tmp);
+    return ALG_OK;
+}
+
+alg_state optim_fresh_best_solution(optim_handle *handle, alg_matrix *population, alg_vector *fitness, int index) {
     handle->bast_value = fitness->vector[index];
     for (int i = 0; i < population->col; i++)
         handle->best_solution->vector[i] = *alg_matrix_get_pos_val(population, index, i);
-    alg_vector_free(tmp);
     return ALG_OK;
 }
 

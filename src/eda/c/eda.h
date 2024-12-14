@@ -4,18 +4,15 @@
 #include "../../basic_opti.h"
 
 typedef struct {
-    int dim, population_size;
+    optim_handle optim;
+    int pop_size;
     alg_matrix *population;
     alg_vector *fitness;
-    double llim, rlim;
-    double elitism_rate, best_val;
-    alg_vector *best_solve;
-    optimization function;
+    double elitism_rate;
 } eda_handle;
 
-eda_handle *eda_init(int dim, int population_size, double llim, double rlim, double elitism_rate,
-                     optimization function);
-alg_state eda_fresh(eda_handle *handle);
-alg_state eda_free(eda_handle *handle);
+ALG_MATH_API eda_handle *eda_init(optim_handle optim, int pop_size, double elitism_rate);
+ALG_MATH_API alg_state eda_fresh(eda_handle *handle, int gen);
+ALG_MATH_API alg_state eda_free(eda_handle *handle);
 
 #endif

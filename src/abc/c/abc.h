@@ -5,13 +5,13 @@
 
 typedef struct {
     optim_handle optim;
-    int pop_size;
-    
+    int pop_size, max_count;
+    alg_matrix *population;
+    alg_vector *fitness;
+    int *count;
 } abc_handle;
 
-abc_handle *abc_init(int food_number, int dimension, double lower_bound, double upper_bound, int limit,
-                     optimization function);
-alg_state abc_fresh(abc_handle *handle);
-alg_state abc_free(abc_handle *handle);
-int abc_get_best_solution(abc_handle *handle);
+ALG_MATH_API abc_handle *abc_init(optim_handle optim, int pop_size, int max_count);
+ALG_MATH_API alg_state abc_fresh(abc_handle *handle, int gen);
+ALG_MATH_API alg_state abc_free(abc_handle *handle);
 #endif

@@ -3,26 +3,21 @@
 
 #include "../../basic_opti.h"
 
-typedef enum {
-    PSO_USE_MAX,
-    PSO_USE_MIN,
-} pso_type;
 typedef struct {
+    optim_handle optim;
     double w;
     double c1, c2;
-    double r1, r2;
-    int dim, number;
+    int pop_size;
     int g_best_index;
     double *p_best_fitness, g_best_fitness;
     alg_matrix *position;
     alg_matrix *vec;
     alg_matrix *p_best, *g_best;
-    optimization func;
-    pso_type type;
+    alg_vector *fitness;
 } pso_handle;
 
-pso_handle *pso_init(int number, int dim, double w, double c1, double c2, optimization function, pso_type type);
-void pso_fresh(pso_handle *pso_structure, double min_vec, double max_vec);
-pso_handle *pso_free(pso_handle *pso_structure);
+ALG_MATH_API pso_handle *pso_init(optim_handle optim, int pop_size, double w, double c1, double c2);
+ALG_MATH_API alg_state pso_fresh(pso_handle *handle, int gen);
+ALG_MATH_API alg_state pso_free(pso_handle *handle);
 
 #endif //!__PSO__H__

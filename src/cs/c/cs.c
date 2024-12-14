@@ -119,7 +119,6 @@ alg_state cs_fresh(cs_handle *handle, int gen) {
 }
 
 alg_state cs_free(cs_handle *handle) {
-    optim_free(&handle->optim);
     alg_matrix_free(handle->population);
     alg_vector_free(handle->fitness);
     ALG_FREE(handle);

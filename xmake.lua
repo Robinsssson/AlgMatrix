@@ -9,9 +9,10 @@ else
     set_toolchains("gcc")
 end 
 
-target("pso")
-    set_kind("binary")
-    add_files("src/pso/c/*.c", "src/*.c")
+target("alg-project")
+    set_kind("shared")
+    add_files("src/**.c")
+    add_defines("ALG_EXPORT")
     add_deps("algmath")
     add_includedirs("algmath")
     add_cflags(
@@ -21,109 +22,10 @@ target("pso")
         "-Wredundant-decls"
     )
 
-
-target("ga")
+target("test-alg-project")
     set_kind("binary")
-    add_files("src/ga/c/*.c", "src/*.c")
-    add_deps("algmath")
-    add_includedirs("algmath")
-    add_cflags(
-        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
-        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
-        "-Wstrict-prototypes", "-Wmissing-prototypes", 
-        "-Wredundant-decls"
-    )
-
-
-target("abc")
-    set_kind("binary")
-    add_files("src/abc/c/*.c", "src/*.c")
-    add_deps("algmath")
-    add_includedirs("algmath")
-    add_cflags(
-        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
-        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
-        "-Wstrict-prototypes", "-Wmissing-prototypes", 
-        "-Wredundant-decls"
-    )
-
-target("aco")
-    set_kind("binary")
-    add_files("src/aco/c/*.c", "src/*.c")
-    add_deps("algmath")
-    add_includedirs("algmath")
-    add_cflags(
-        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
-        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
-        "-Wstrict-prototypes", "-Wmissing-prototypes", 
-        "-Wredundant-decls"
-    )
-
-target("aia")
-    set_kind("binary")
-    add_files("src/aia/c/*.c", "src/*.c")
-    add_deps("algmath")
-    add_includedirs("algmath")
-    add_cflags(
-        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
-        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
-        "-Wstrict-prototypes", "-Wmissing-prototypes", 
-        "-Wredundant-decls"
-    )
-
-target("sa")
-    set_kind("binary")
-    add_files("src/sa/c/*.c", "src/*.c")
-    add_deps("algmath")
-    add_includedirs("algmath")
-    add_cflags(
-        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
-        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
-        "-Wstrict-prototypes", "-Wmissing-prototypes", 
-        "-Wredundant-decls"
-    )
-
-target("eda")
-    set_kind("binary")
-    add_files("src/eda/c/*.c", "src/*.c")
-    add_deps("algmath")
-    add_includedirs("algmath")
-    add_cflags(
-        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
-        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
-        "-Wstrict-prototypes", "-Wmissing-prototypes", 
-        "-Wredundant-decls"
-    )
-
-target("de")
-    set_kind("binary")
-    add_files("src/de/c/*.c", "src/*.c")
-    add_deps("algmath")
-    add_includedirs("algmath")
-    add_cflags(
-        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
-        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
-        "-Wstrict-prototypes", "-Wmissing-prototypes", 
-        "-Wredundant-decls"
-    )
-
-target("cs")
-    set_kind("binary")
-    add_files("src/cs/c/*.c", "src/*.c")
-    add_deps("algmath")
-    add_includedirs("algmath")
-    add_cflags(
-        "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
-        "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 
-        "-Wstrict-prototypes", "-Wmissing-prototypes", 
-        "-Wredundant-decls"
-    )
-
-target("cso")
-    set_kind("binary")
-    add_files("src/cso/c/*.c", "src/*.c")
-    add_deps("algmath")
-    add_includedirs("algmath")
+    add_files("test/**.c")
+    add_deps("alg-project")
     add_cflags(
         "-Wall", "-Wextra", "-Werror", "-pedantic", "-std=c11",
         "-Wshadow", "-Wconversion", "-Wfloat-equal", "-Wundef", 

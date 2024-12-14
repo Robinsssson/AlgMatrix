@@ -20,8 +20,8 @@ typedef struct {
 } cso_handle;
 
 // 函数声明
-cso_handle *cso_init(optim_handle optim, int pop_size, int rn, int hn, int cn, double fl);
-alg_state cso_fresh(cso_handle *handle, int gen);
-alg_state cso_free(cso_handle *handle);
+ALG_MATH_API cso_handle *cso_init(optim_handle optim, int pop_size, int rn, int hn, int cn, double fl);
+ALG_MATH_API alg_state cso_fresh(cso_handle *handle, int gen);
+ALG_MATH_API alg_state cso_free(cso_handle *handle);
 
 #endif // CSO_H

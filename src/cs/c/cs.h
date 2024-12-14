@@ -2,7 +2,7 @@
 #define __CS_H
 
 #include "../../basic_opti.h"
-#include "alg_inc.h"
+
 
 typedef struct {
     optim_handle optim;
@@ -12,8 +12,8 @@ typedef struct {
     alg_vector *fitness;
 } cs_handle;
 
-cs_handle *cs_init(optim_handle optim, int pop_size, double step_size, double pa, double lambda);
-alg_state cs_fresh(cs_handle *handle, int gen);
-alg_state cs_free(cs_handle *handle);
+ALG_MATH_API cs_handle *cs_init(optim_handle optim, int pop_size, double step_size, double pa, double lambda);
+ALG_MATH_API alg_state cs_fresh(cs_handle *handle, int gen);
+ALG_MATH_API alg_state cs_free(cs_handle *handle);
 
 #endif // !__CS_H

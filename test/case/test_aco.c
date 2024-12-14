@@ -1,9 +1,9 @@
-#include "aco.h"
-#include <algmath.h>
-#include <math.h>
-#include <stdio.h>
+#include "../test_framework.h"
+#include "../debug_memory.h"
+#include "../../src/optimization.h"
+#include "../test_function_list.h"
 
-// 定义城市数量
+
 #define CITY_COUNT 8
 
 // 定义城市坐标
@@ -28,7 +28,7 @@ static alg_matrix *create_city_coords_matrix(void) {
     return city_coords;
 }
 
-static void test_aco(void) {
+int test_aco(void) {
     // 1. 创建城市坐标矩阵
     alg_matrix *city_coords = create_city_coords_matrix();
 
@@ -42,7 +42,7 @@ static void test_aco(void) {
     aco_handle *aco = aco_init(number, city_coords, alpha, beta, rho);
     if (aco == NULL) {
         printf("ACO initialization failed!\n");
-        return;
+        return TEST_FAILED;
     }
 
     // 4. 执行 ACO 算法，寻找最短路径
@@ -50,7 +50,7 @@ static void test_aco(void) {
         if (aco_fresh(aco) != ALG_OK) {
             printf("ACO algorithm failed!\n");
             aco_free(aco);
-            return;
+            return TEST_FAILED;
         }
         // 5. 输出最佳路径和路径长度
         printf("Best path: ");
@@ -64,10 +64,6 @@ static void test_aco(void) {
 
     // 6. 释放 ACO 算法的资源
     aco_free(aco);
-}
-
-int main(void) {
-    // 执行测试
-    test_aco();
-    return 0;
+    check_memory_leaks();
+    return TEST_PASSED;
 }

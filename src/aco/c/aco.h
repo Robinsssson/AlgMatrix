@@ -1,6 +1,7 @@
 #ifndef __ACO_H
 #define __ACO_H
-#include <algmath.h>
+
+#include "../../basic_opti.h"
 
 typedef struct {
     alg_matrix *city_coords;
@@ -10,7 +11,7 @@ typedef struct {
     double best_length;
     alg_matrix *pheromone, *dist;
 } aco_handle;
-aco_handle *aco_init(int number, alg_matrix *city_coords, double alpha, double beta, double rho);
-alg_state aco_fresh(aco_handle *handle);
-alg_state aco_free(aco_handle *handle);
+ALG_MATH_API aco_handle *aco_init(int number, alg_matrix *city_coords, double alpha, double beta, double rho);
+ALG_MATH_API alg_state aco_fresh(aco_handle *handle);
+ALG_MATH_API alg_state aco_free(aco_handle *handle);
 #endif // !__ACO_H
